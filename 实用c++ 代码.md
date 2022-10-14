@@ -1,4 +1,23 @@
 
+# 大小端
+```cpp
+void tt()
+{
+    const union {
+        int one;
+        char little;
+    } check_endian = { 1 };
+
+    if (check_endian.little)
+    {
+        //小端
+    }
+    else
+    {
+        //大端
+    }
+}
+```
 
 # 全局只初始化一次的过程
 

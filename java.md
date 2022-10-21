@@ -49,3 +49,130 @@ java -jar lm_cipher_sdk.jar
 
 
 
+
+
+# 判断操作系统
+
+public enum EPlatform {
+	Any("any"),
+	Linux("Linux"),
+	Mac_OS("Mac OS"),
+	Mac_OS_X("Mac OS X"),
+	Windows("Windows"),
+	OS2("OS/2"),
+	Solaris("Solaris"),
+	SunOS("SunOS"),
+	MPEiX("MPE/iX"),
+	HP_UX("HP-UX"),
+	AIX("AIX"),
+	OS390("OS/390"),
+	FreeBSD("FreeBSD"),
+	Irix("Irix"),
+	Digital_Unix("Digital Unix"),
+	NetWare_411("NetWare"),
+	OSF1("OSF1"),
+	OpenVMS("OpenVMS"),
+	Others("Others");
+	
+	private EPlatform(String desc){
+		this.description = desc;
+	}
+	
+	public String toString(){
+		return description;
+	}
+	
+	private String description;
+}
+
+String OS = System.getProperty("os.name").toLowerCase();
+if(OS.indexOf("linux")>=0)
+if(OS.indexOf("windows")>=0)
+if(OS.indexOf("mac")>=0)
+
+
+# JNI loadlibrary
+
+```java
+public static boolean JNI_LoadLibrary(){
+			
+		String OS = System.getProperty("os.name").toLowerCase();
+	
+		String [] libs = {"lm_cipher_sdk.1.0.dll","liblm_cipher_sdk.1.0.so","liblm_cipher_sdk.1.0.dylib"};
+	
+		String curDir = System.getProperty("user.dir");
+	
+		String libName = libs[0];
+		if(OS.indexOf("windows")>=0)
+		{
+			libName = libs[0];
+		}
+		else if(OS.indexOf("mac")>=0)
+		{
+			libName=libs[2];
+		}
+		else
+		{
+			libName=libs[1];
+		}
+	
+		
+		try{															
+			
+			InputStream is = lm_cipher_sdkJNI.class.getResourceAsStream(libName);
+			if(is == null){		
+				System.exit(1);	
+			}
+
+			//File f = new File("." + File.separator + libs[i]);	
+			libName = curDir + File.separator + libName;
+		
+			String path = lm_cipher_sdkJNI.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+			if(path.endsWith(".jar"))
+			{
+				File f = new File(libName);
+				if(!f.exists()){
+					f.createNewFile();
+				}	
+			
+				FileOutputStream os = new FileOutputStream(f);	
+				byte[] cache =  new byte[1024];				
+				int realRead = is.read(cache);
+				while(realRead != -1){
+					os.write(cache, 0, realRead);
+					realRead = is.read(cache);
+				}
+				os.close();
+				is.close();
+			}
+			else
+			{
+				int count = is.available();
+				byte[] cache = new byte[count];
+				is.read(cache);
+				is.close();
+
+				File f = new File(libName);
+				if(!f.exists()){
+					f.createNewFile();
+				}	
+				FileOutputStream os = new FileOutputStream(f);
+				os.write(cache, 0, count);
+				os.close();
+			}
+
+		}catch(Exception e){				
+			e.printStackTrace();	
+			System.exit(1);	
+		}
+	
+		try {
+			//System.loadLibrary("lm_cipher_sdk.1.0");
+			System.load(libName);
+			return true;
+		}catch (UnsatisfiedLinkError e) {
+			System.exit(1);	
+		}	
+		return false;	
+	}
+```

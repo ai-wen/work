@@ -176,3 +176,82 @@ public static boolean JNI_LoadLibrary(){
 		return false;	
 	}
 ```
+
+
+# java ssl
+
+## 配置ssl证书
+```java
+System.setProperty("javax.net.ssl.keyStore", "path/to/keystore.jks");
+System.setProperty("javax.net.ssl.keyStorePassword", "changeit");
+System.setProperty("javax.net.ssl.keyStoreType", "JKS");
+
+System.setProperty("javax.net.ssl.trustStore", "path/to/truststore.jks");
+System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
+System.setProperty("javax.net.ssl.trustStoreType", "JKS");
+```	
+## springboot项目配置ssl证书
+application.properties 文件中配置
+#https对应443端口
+server.port=443
+#证书路径
+server.ssl.key-store=classpath:qcl.30paotui.com.jks
+#证书密码
+server.ssl.key-store-password=x6qm42y4auvhh
+#证书类型
+server.ssl.key-store-type=JKS
+
+## keystore
+Java也有一个统一管理信任证书的地方， 是一个叫 keystore 的文件 (默认是位于 $JAVA_HOME/lib/security/cacerts ) 
+该文件使用 keytool 工具去管理 (该工具默认位于 $JAVA_HOME/bin/keytool )
+```c
+导入证书到java默认的jdk库中：
+keytool -import -alias <证书别名> -keystore $JAVA_HOME/jre/lib/security/cacerts -file your.crt -storepass changeit  -trustcacerts
+
+参数说明：
+-keystore  执行后添加证书的位置
+-file      证书的位置
+-alias     证书的别名
+
+查看证书：
+keytool -list -keystore "/usr/java/jdk1.8.0_60/jre/lib/security/cacerts" -storepass changeit |grep "证书的别名"
+
+删除证书,将证书从keystore移除：
+keytool -delete -storepass changeit -keystore $JAVA_HOME/jre/lib/security/cacerts -alias "证书的别名"
+
+```
+1.keystore文件都受密码保护，访问一个已有的 keystore 文件时，会要求你验证密码，默认密码为 changeit，所以keytool命令要加上-storepass changeit
+2.需用root用户执行。
+
+## 自签名pem证书转换jks
+
+首先将 PEM 转换为 PKCS12证书。
+openssl pkcs12 -export -out certificate.p12 -inkey key.pem -in cert.pem
+
+keytool -importkeystore -destkeystore keystore.jks -srcstoretype PKCS12 -srckeystore certificate.p12
+keytool -list -keystore keystore.jks
+
+
+openssl pkcs12 -in certificate.p12 -cacerts -nokeys -out chain.pem
+keytool -importcert -trustcacerts -file chain.pem -keystore truststore.jks
+
+
+假设有三个PEM证书文件：
+ca.cert.pem —— 根证书文件
+cert.cert.pem —— 证书文件
+cert.key.pem —— 证书的密钥文件
+我们需要将根证书ca.cert.pem转换成JKS格式的根证书truststore.jks；
+并将cert.pem和cert.key.pem转换成JKS格式的证书keystore.jks。
+- openssl pkcs12 -export -out cert.p12 -in cert.pem -inkey cert.key.pem
+- keytool -importkeystore -destkeystore keystore.jks -srcstoretype PKCS12 -srckeystore cert.p12
+- keytool -import -file ca.cert.pem -keystore truststore.jks  -trustcacerts
+
+```demo
+keytool -importkeystore -destkeystore keystore.jks -srcstoretype PKCS12 -srckeystore client_cert_xxx.pfx -srcstorepass 12345678 -deststorepass 12345678
+keytool -list -keystore keystore.jks
+
+keytool -importcert -keystore truststore.jks -file ca_root_cert.pem -storepass 12345678 -trustcacerts -alias ca -noprompt 
+keytool -list -keystore truststore.jks
+
+是否信任此证书? [否]:  y
+```

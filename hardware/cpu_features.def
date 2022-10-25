@@ -1,0 +1,8 @@
+LIBRARY cpu_features.dll
+
+EXPORTS
+	GetX86Info
+	GetArmInfo
+	GetAarch64Info
+	GetMipsInfo
+	GetPPCInfo

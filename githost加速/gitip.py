@@ -54,8 +54,8 @@ def RMDomain(ip):
     hosts.write(context)
     hosts.close()
 
-def OpenHost(): 
-    os.system("notepad "+hostfile)
+
+
 
 get('https://ipaddress.com/site/github.com','github.com')
 get('https://ipaddress.com/site/assets-cdn.github.com','assets-cdn.github.com')
@@ -68,5 +68,7 @@ for i in range(0,len(items)):
     AddDomain(items[i][0],items[i][1])
     
 os.system("ipconfig /flushdns")
+
+os.system("notepad "+hostfile)
 
 # pyinstaller -F -c --uac-admin gitip.py

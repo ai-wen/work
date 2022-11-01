@@ -85,8 +85,9 @@ func main() {  //--必须
     // Need a main function to make CGO compile package as C shared library
 }
 ```
-//go build -buildmode=c-shared -o test.dll testdll.go
-//go build -buildmode=c-archive -o test.a testdll.go
+
+go build -buildmode=c-shared -o test.dll testdll.go
+go build -buildmode=c-archive -o test.a testdll.go
 
 
 ## 静态库包
@@ -105,139 +106,15 @@ go tool link -o testa.exe -L %GOPATH%\pkg\windows_amd64 testa.o
 -L选项指定了静态库xxx.a的路径
 
 
+## go help buildmode命令可以查看C静态库和C动态库的构建说明
 
-```go
-package main
+##  从非main包导出C函数，或者是多个包导出C函数
+https://books.studygolang.com/advanced-go-programming-book/ch2-cgo/ch2-06-static-shared-lib.html
 
-import "C"
+## 32位
+go env
+set GOARCH=386 
+set GOARCH=amd64
 
-import (
-	"fmt"
-	"randomness"	
-)
-
-/*
-[ 1] 单比特频数检测 MonoBitFrequencyTest
-[ 2] 块内频数检测 FrequencyWithinBlockTest
-[ 3] 扑克检测 PokerTest
-[ 4] 重叠子序列检测 OverlappingTemplateMatchingTest
-[ 5] 游程总数检测 RunsTest
-[ 6] 游程分布检测 RunsDistributionTest
-[ 7] 块内最大游程检测 LongestRunOfOnesInABlockTest
-[ 8] 二元推导检测 BinaryDerivativeTest
-[ 9] 自相关检测 AutocorrelationTest
-[10] 矩阵秩检测 MatrixRankTest
-[11] 累加和检测 CumulativeTest
-[12] 近似熵检测 ApproximateEntropyTest
-[13] 线型复杂度检测 LinearComplexityTest
-[14] Maurer通用统计检测 MaurerUniversalTest
-[15] 离散傅里叶检测 DiscreteFourierTransformTest
-*/
-
-
-//export MBFTest
-func MBFTest(data []byte) (float64) {	
-	p, q := randomness.MonoBitFrequencyTest(randomness.B2bitArr(data))
-
-	if fmt.Sprintf("%.6f", p) != "0.215925" || fmt.Sprintf("%.6f", q) != "0.892038" {
-		return 0
-	}
-	return 1
-}
-
-//export FWBTest
-func FWBTest(data []byte) (float64){	
-	p, q := randomness.FrequencyWithinBlockTest(randomness.B2bitArr(data))
-	if fmt.Sprintf("%.6f", p) != "0.706438" || fmt.Sprintf("%.6f", q) != "0.706438" {
-		return 0
-	}
-	return 1
-}
-
-//export PKTest
-func PKTest(data []byte, m int) (float64){
-	p, q := randomness.PokerProto(randomness.B2bitArr(data), m)
-
-	if fmt.Sprintf("%.6f", p) != "0.213734" || fmt.Sprintf("%.6f", q) != "0.213734" {
-		return 0
-	}
-	return 1
-}
-
-
-func main() {
-    // Need a main function to make CGO compile package as C shared library
-}
-
-
-//编译动态库 静态库
-//go build -buildmode=c-shared -o test.dll testdll.go
-//go build -buildmode=c-archive -o test.a testdll.go
-
-//https://github.com/Trisia/randomness  国密最新随机数检测规范
-
-
-
-```
-
-```go
-package main
-
-import (
-	"fmt"
-	"math/rand"
-	"randomness"
-	"randomness/detect"
-		
-)
-
-func createDistributions(s, m int) [][]float64 {
-	res := make([][]float64, m)
-	for i := 0; i < m; i++ {
-		res[i] = make([]float64, s)
-	}
-	return res
-}
-
-// PowerOnDetect 上电自检，15种检测，每组 10^6比特，分20组
-func main() {
-
-	s := 20
-	t := detect.Threshold(s)
-
-	buf := make([]byte, 1000_000/8)
-	counters := make([]int, 15)
-
-	distributions := createDistributions(s, 15)
-
-	for i := 0; i < s; i++ {
-
-		_, _ = rand.Read(buf)
-
-		resArr := detect.Round15(buf)
-		for idx, result := range resArr {
-			distributions[idx][i] = result.Q
-			if result.Pass {
-				counters[idx]++
-			}
-		}
-	}
-	for i, n := range counters {
-		if n < t {
-			 fmt.Printf("%s %d/%d", randomness.TestMethodArr[i].Name, n, s)
-			 return
-		}
-	}
-	for i := range distributions {
-		Pt := detect.ThresholdQ(distributions[i])
-		if Pt < randomness.AlphaT {
-			fmt.Printf("%s %f", randomness.TestMethodArr[i].Name, Pt)
-			return 
-		}
-	}
-
-	fmt.Printf("15种算法 上电自检 20组 10^6 \n")
-	
-	return
-}
-```
+GOOS=windows GOARCH=386 go build main.go
+GOOS=windows GOARCH=amd64 go build main.go

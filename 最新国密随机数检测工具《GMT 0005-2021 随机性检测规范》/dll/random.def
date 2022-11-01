@@ -1,0 +1,17 @@
+LIBRARY random.dll
+EXPORTS
+    MonoBitFrequency
+    Frequency
+    Poker
+    Overlapping
+    Runs
+    RunsDistribution
+    LongestRun
+    BinaryDerivative
+    Autocorrelation
+    MatrixRank
+    Cumulative
+    ApproximateEntropy
+    LinearComplexity
+    MaurerUniversal
+    DiscreteFourier

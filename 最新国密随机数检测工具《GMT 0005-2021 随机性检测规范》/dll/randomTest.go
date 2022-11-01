@@ -1,10 +1,3 @@
-# [随机数生成工具](https://github.com/Trisia/randomness/blob/master/tools/rdgen/README.md)
-
-# [随机性检测工具](https://github.com/Trisia/randomness/blob/master/tools/rddetector/README.md)
-
-
-
-```go
 package main
 
 import "C"
@@ -38,7 +31,6 @@ const Alpha = 0.01
 //const AlphaT float64 = 0.0001
 
 //1百万bit 	125000字节  122k
-
 
 //export MonoBitFrequency
 func MonoBitFrequency(data []byte) (int) {	
@@ -207,41 +199,22 @@ func main() {
     // Need a main function to make CGO compile package as C shared library
 }
 
-```
 
-```.def
-LIBRARY random.dll
-EXPORTS
-    MonoBitFrequency
-    Frequency
-    Poker
-    Overlapping
-    Runs
-    RunsDistribution
-    LongestRun
-    BinaryDerivative
-    Autocorrelation
-    MatrixRank
-    Cumulative
-    ApproximateEntropy
-    LinearComplexity
-    MaurerUniversal
-    DiscreteFourier
-```
+//编译动态库 静态库
+//go build -buildmode=c-shared -o random.dll randomTest.go
+//go build -buildmode=c-archive -o random.a randomTest.go
 
-go get -u github.com/Trisia/randomness
+//https://github.com/Trisia/randomness  国密最新随机数检测规范
 
-## 编译动态库 静态库
-go build -buildmode=c-shared -o random.dll randomTest.go
-go build -buildmode=c-archive -o random.a randomTest.go
-
-https://github.com/Trisia/randomness  国密最新随机数检测规范
-
-
-## 通过动态库生成 .lib 符号文件
-1、创建一个 .def文件
-2、打开vs comand
+/*
+//通过动态库生成 .lib 符号文件
+//1、创建一个 .def文件
+打开vs comand
 C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\lib.exe
 生成目标64位的命令格式： lib.exe /def:random.def /machine:x64 /out:random64.lib
 生成目标32位的命令格式： lib.exe /def:random.def /machine:x86 /out:random32.lib
 
+
+
+生成目标64位的命令格式： lib.exe /def:msvcrt.def /machine:x64 /out:msvcrt64.lib
+*/

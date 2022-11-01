@@ -64,16 +64,24 @@ func Poker(data []byte, m int) (int){
 }
 
 //export Overlapping
-func Overlapping(data []byte, m int) (int){
+func Overlapping(data []byte, m int) (int,int){
 	// 3  5
 	p1, p2, _, _ := randomness.OverlappingTemplateMatchingProto(randomness.B2bitArr(data), m)
 
-	if p1 >= Alpha {		
-		if p2 >= Alpha {
-			return 0
-		}
+
+	if p1 >= Alpha && p2 >= Alpha {		
+		return 0,0
 	}
-	return 1
+
+	if p1 >= Alpha {		
+		return 0,1
+	}
+
+	if p2 >= Alpha {
+		return 1,0
+	}
+
+	return 1,1
 }
 
 //export Runs

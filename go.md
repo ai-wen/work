@@ -66,3 +66,116 @@ go env
 mkdir -p $GOPATH/src/golang.org/x
 cd $GOPATH/src/golang.org/x
 git clone https://github.com/golang/sys.git
+
+
+
+
+## 编译动态库 静态库
+```go
+//动态库基本元素
+package main		--必须	
+import "C"       	--必须
+
+//export TestFun    --必须和函数之间无空行 只有导出函数才会生成 .h头文件
+func TestFun() (float64) {
+	return 1
+}
+
+func main() {  //--必须
+    // Need a main function to make CGO compile package as C shared library
+}
+```
+//go build -buildmode=c-shared -o test.dll testdll.go
+//go build -buildmode=c-archive -o test.a testdll.go
+
+
+## 静态库包
+go install xxpkg
+
+编译静态库 生成.a文件
+如果包在 %GOPATH%\src 目录下，编译静态库xxx.a 直接使用命令 go install randomness
+静态库生成在 %GOPATH%\pkg\windows_amd64
+
+使用静态库 生成.o文件
+go tool compile -I %GOPATH%\pkg\windows_amd64 testa.go
+-I选项指定了xxx包的安装路径，供testa.go导入使用
+
+链接生成可执行文件
+go tool link -o testa.exe -L %GOPATH%\pkg\windows_amd64 testa.o
+-L选项指定了静态库xxx.a的路径
+
+
+
+```go
+package main
+
+import "C"
+
+import (
+	"fmt"
+	"randomness"	
+)
+
+/*
+[ 1] 单比特频数检测 MonoBitFrequencyTest
+[ 2] 块内频数检测 FrequencyWithinBlockTest
+[ 3] 扑克检测 PokerTest
+[ 4] 重叠子序列检测 OverlappingTemplateMatchingTest
+[ 5] 游程总数检测 RunsTest
+[ 6] 游程分布检测 RunsDistributionTest
+[ 7] 块内最大游程检测 LongestRunOfOnesInABlockTest
+[ 8] 二元推导检测 BinaryDerivativeTest
+[ 9] 自相关检测 AutocorrelationTest
+[10] 矩阵秩检测 MatrixRankTest
+[11] 累加和检测 CumulativeTest
+[12] 近似熵检测 ApproximateEntropyTest
+[13] 线型复杂度检测 LinearComplexityTest
+[14] Maurer通用统计检测 MaurerUniversalTest
+[15] 离散傅里叶检测 DiscreteFourierTransformTest
+*/
+
+
+//export MBFTest
+func MBFTest(data []byte) (float64) {	
+	p, q := randomness.MonoBitFrequencyTest(randomness.B2bitArr(data))
+
+	if fmt.Sprintf("%.6f", p) != "0.215925" || fmt.Sprintf("%.6f", q) != "0.892038" {
+		return 0
+	}
+	return 1
+}
+
+//export FWBTest
+func FWBTest(data []byte) (float64){	
+	p, q := randomness.FrequencyWithinBlockTest(randomness.B2bitArr(data))
+	if fmt.Sprintf("%.6f", p) != "0.706438" || fmt.Sprintf("%.6f", q) != "0.706438" {
+		return 0
+	}
+	return 1
+}
+
+//export PKTest
+func PKTest(data []byte, m int) (float64){
+	p, q := randomness.PokerProto(randomness.B2bitArr(data), m)
+
+	if fmt.Sprintf("%.6f", p) != "0.213734" || fmt.Sprintf("%.6f", q) != "0.213734" {
+		return 0
+	}
+	return 1
+}
+
+
+func main() {
+    // Need a main function to make CGO compile package as C shared library
+}
+
+
+//编译动态库 静态库
+//go build -buildmode=c-shared -o test.dll testdll.go
+//go build -buildmode=c-archive -o test.a testdll.go
+
+//https://github.com/Trisia/randomness  国密最新随机数检测规范
+
+
+
+```

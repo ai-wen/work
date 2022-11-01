@@ -179,3 +179,65 @@ func main() {
 
 
 ```
+
+```go
+package main
+
+import (
+	"fmt"
+	"math/rand"
+	"randomness"
+	"randomness/detect"
+		
+)
+
+func createDistributions(s, m int) [][]float64 {
+	res := make([][]float64, m)
+	for i := 0; i < m; i++ {
+		res[i] = make([]float64, s)
+	}
+	return res
+}
+
+// PowerOnDetect 上电自检，15种检测，每组 10^6比特，分20组
+func main() {
+
+	s := 20
+	t := detect.Threshold(s)
+
+	buf := make([]byte, 1000_000/8)
+	counters := make([]int, 15)
+
+	distributions := createDistributions(s, 15)
+
+	for i := 0; i < s; i++ {
+
+		_, _ = rand.Read(buf)
+
+		resArr := detect.Round15(buf)
+		for idx, result := range resArr {
+			distributions[idx][i] = result.Q
+			if result.Pass {
+				counters[idx]++
+			}
+		}
+	}
+	for i, n := range counters {
+		if n < t {
+			 fmt.Printf("%s %d/%d", randomness.TestMethodArr[i].Name, n, s)
+			 return
+		}
+	}
+	for i := range distributions {
+		Pt := detect.ThresholdQ(distributions[i])
+		if Pt < randomness.AlphaT {
+			fmt.Printf("%s %f", randomness.TestMethodArr[i].Name, Pt)
+			return 
+		}
+	}
+
+	fmt.Printf("15种算法 上电自检 20组 10^6 \n")
+	
+	return
+}
+```

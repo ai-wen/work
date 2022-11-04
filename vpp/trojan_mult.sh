@@ -66,7 +66,7 @@ EOF
     rm -rf /usr/share/nginx/html/*
     cd /usr/share/nginx/html/
     
-    wget https://raw.githubusercontent.com/ai-wen/work/main/index.html    
+    wget https://raw.githubusercontent.com/ai-wen/work/main/vpp/index.html 
 
     sleep 5
     if [ ! -d "/usr/src" ]; then

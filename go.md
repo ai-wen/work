@@ -4,6 +4,20 @@ https://golang.google.cn/dl/
 # 网络访问 配置国内代理
 go env -w GOPROXY=https://goproxy.cn
 
+# VSCOD 使用go
+命令行设置
+go env -w GO111MODULE=off
+go env -w GOPROXY=https://goproxy.cn,direct
+
+安装插件 Go 和 Go Nightly
+Ctrl+Shift+P
+输入 Go:Install/Update Tools
+全部勾选，再点击Ok安装
+
+# 使用Go Modules管理依赖
+这是官方推荐的为了替代GOPATH而诞生的一个Go语言依赖库管理器。之前所有的包都丢在GOPATH中，它的最大的好处就是，我们依赖的包可以指定版本。其次所有程序依赖的包，只会存在同一份。不会像npm那样，同一个包还能有n多个存在。这样我们的电脑就很省空间了
+使用起来也非常简单，常用命令就一个go mod tidy，通俗来说就是将当前的库源码文件所依赖的包，全部安装并记录下来，多的包就删掉，少了的就自动补上
+go mod init 
 
 # 编译 go 项目
 

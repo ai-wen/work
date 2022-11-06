@@ -19,6 +19,24 @@ Ctrl+Shift+P
 使用起来也非常简单，常用命令就一个go mod tidy，通俗来说就是将当前的库源码文件所依赖的包，全部安装并记录下来，多的包就删掉，少了的就自动补上
 go mod init 
 
+# 下载安装
+go get -u github.com/motemen/gore
+u 强制使用网络去更新包和它的依赖包
+github.com 网站域名：表示代码托管的网站，类似于电子邮件 @ 后面的服务器地址。
+motemen 作者或机构：表明这个项目的归属，一般为网站的用户名，如果需要找到这个作者下的所有项目，可以直接在网站上通过搜索“域名/作者”进行查看。这部分类似于电子邮件 @ 前面的部分。
+gore 项目名：每个网站下的作者或机构可能会同时拥有很多的项目，图中标示的部分表示项目名称。
+
+默认情况下，go get 可以直接使用。 go get github.com/motemen/gore
+获取前，请确保 GOPATH 已经设置。Go 1.8 版本之后，GOPATH 默认在用户目录的 go 文件夹下。GOPATH=C:\Users\lw\go
+
+
+删除：
+直接删除源文件目录及编译后的package目录即可。
+在源码目录$GOPATH/src下找到你要删除的package名，直接删除；
+然后在$GOPATH/pkg/<architecture>下删除编译后的package目标文件目录。
+
+go clean命令自动删除编译后的package目录，再手动删除源文件目录
+	
 # 编译 go 项目
 
 go build main.go

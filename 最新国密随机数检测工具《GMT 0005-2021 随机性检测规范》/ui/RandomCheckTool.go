@@ -572,7 +572,7 @@ func makeBasicControlsPage() ui.Control {
 	grid.Append(ui.NewLabel("最新国密随机数质量检测工具,支持《GMT 0005-2021 随机性检测规范》。"),
 		0, 0, 1, 1,
 		true, ui.AlignCenter, true, ui.AlignCenter)
-	grid.Append(ui.NewLabel("充分利用多核cpu进行检测,大大缩短检测速度。"),
+	grid.Append(ui.NewLabel("充分利用多核cpu进行检测,大大缩短检测时间。"),
 		0, 1, 1, 1,
 		true, ui.AlignCenter, false, ui.AlignCenter)
 

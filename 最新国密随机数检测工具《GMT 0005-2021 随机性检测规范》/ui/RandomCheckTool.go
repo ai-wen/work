@@ -244,26 +244,28 @@ func worker(jobs <-chan string, out chan<- *R) {
 	}
 }
 
-var lock sync.Mutex
+//var lock sync.Mutex
+
 
 // 结果集写入文件工作器
 func resultWriter(in <-chan *R, w io.StringWriter, cnt []int32, wg *sync.WaitGroup) {
 	for r := range in {
 		_, _ = w.WriteString(r.Name)
 
-		lock.Lock()
+		//lock.Lock()
 
 		for j := 0; j < len(r.P); j++ {
 			if r.P[j] >= 0.01 {
 				atomic.AddInt32(&cnt[j], 1)
-				labels_succ[selectslice[j]].SetText(fmt.Sprintf("%d", cnt[j]))
+				//崩溃
+				//labels_succ[selectslice[j]].SetText(fmt.Sprintf("%d", cnt[j]))
 			} else {
 				atomic.AddInt32(&failcnt[j], 1)
-				labels_fail[selectslice[j]].SetText(fmt.Sprintf("%d", failcnt[j]))
+				//labels_fail[selectslice[j]].SetText(fmt.Sprintf("%d", failcnt[j]))
 			}
 			_, _ = w.WriteString(fmt.Sprintf(", %0.6f", r.P[j]))
 		}
-		lock.Unlock()
+		//lock.Unlock()
 		_, _ = w.WriteString("\n")
 
 		wg.Done()
@@ -511,6 +513,12 @@ func makeBasicControlsPage() ui.Control {
 						} else {
 							prosessbar.SetValue(process * percent)
 						}
+
+						for j := 0; j < len(selectslice); j++ {
+							labels_succ[selectslice[j]].SetText(fmt.Sprintf("%d", cnt[j]))
+							labels_fail[selectslice[j]].SetText(fmt.Sprintf("%d", failcnt[j]))
+						}
+						
 						labeltime.SetText(time.Now().Format("2006.01.02 15:04:05"))
 						jobs <- p
 					}

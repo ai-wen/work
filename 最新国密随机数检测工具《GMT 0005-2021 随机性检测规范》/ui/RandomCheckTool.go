@@ -10,6 +10,7 @@ import (
 	"path"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -584,7 +585,22 @@ func makeBasicControlsPage() ui.Control {
 				labeltime.SetText(fmt.Sprintf("%d 分钟 %d 秒", elapsedTime/60, elapsedTime%60))
 				labeltimeend.SetText(time.Now().Format("2006.01.02 15:04:05"))
 
-				ui.MsgBox(mainwin, "国密随机数检测工具", "检测完成")
+				var numCount int = 0
+				//通过的组数
+				var numpass int = int(math.Ceil((1 - Alpha - 3*math.Sqrt(float64((Alpha*(1-Alpha))/float64(setcnt)))) * float64(setcnt)))
+				for j := 0; j < len(selectslice); j++ {
+
+					num, _ := strconv.Atoi(labels_succ[selectslice[j]].Text())
+					if num < numpass {
+						numCount++
+					}
+				}
+
+				if 0 == numCount {
+					ui.MsgBox(mainwin, "所有检测项全部通过", "成功")
+				} else {
+					ui.MsgBoxError(mainwin, fmt.Sprintf("有%d项检测未通过", numCount), "失败")
+				}
 
 				buttonOK.Enable()
 			}()

@@ -473,9 +473,12 @@ func makeBasicControlsPage() ui.Control {
 
 	buttonOK = ui.NewButton("开 始 检 测 ")
 	buttonOK.OnClicked(func(*ui.Button) {
-		buttonOK.Disable()
+
 		filename := entryOutPath.Text()
 		if filename != "" {
+
+			buttonOK.Disable()
+
 			_ = os.MkdirAll(filepath.Dir(filename), os.FileMode(0600))
 
 			selectslice = selectslice[0:0]
@@ -506,6 +509,7 @@ func makeBasicControlsPage() ui.Control {
 				if filename == "" {
 					fmt.Printf(">> 请选择样本文件")
 					ui.MsgBoxError(mainwin, "国密随机数检测工具", "请选择样本文件 ")
+					buttonOK.Enable()
 					return
 				}
 
@@ -515,6 +519,7 @@ func makeBasicControlsPage() ui.Control {
 				if err != nil {
 					fmt.Printf(">> 无法打开写入报告文件")
 					ui.MsgBoxError(mainwin, "国密随机数检测工具", "无法打开写入文件 "+reportPath)
+					buttonOK.Enable()
 					return
 				}
 				defer w.Close()

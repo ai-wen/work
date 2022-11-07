@@ -605,9 +605,9 @@ func makeBasicControlsPage() ui.Control {
 				}
 
 				if 0 == numCount {
-					ui.MsgBox(mainwin, "所有检测项全部通过", "成功")
+					ui.MsgBox(mainwin, "成功", "所有检测项全部通过")
 				} else {
-					ui.MsgBoxError(mainwin, fmt.Sprintf("有%d项检测未通过:%s", numCount, errStr), "失败")
+					ui.MsgBoxError(mainwin, "失败", fmt.Sprintf("有%d项检测未通过:%s", numCount, errStr))
 				}
 
 				buttonOK.Enable()

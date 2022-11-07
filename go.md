@@ -1,6 +1,21 @@
 # 下载
 https://golang.google.cn/dl/
 
+# golang cgo windows mingw64 环境搭建
+MingW 分 32位和64位版本：下载地址分别如下：
+http://sourceforge.net/projects/mingw/
+http://sourceforge.net/projects/mingw-w64/
+
+gcc 主要有三种不同的线程库的定义，分别是 Win32，OS/2，以及 POSIX
+前两种定义只适合于他们各自的平台，而 POSIX wiki 定义的线程库是适用于所有的计算平台的，故肯定使用 threads-posix
+
+C++ Exceptions有三种处理方式
+DWARF 不传递错误，需要使用DWARF-2（或DWARF-3）调试信息，生成的包会很大
+SJLJ 长跳转，即使抛出异常也正常的执行，可以在没有使用GCC编译的代码或者没有调用堆栈展开信息的代码中工作
+SEH 结构化异常处理，Windows使用自己的异常处理机制
+
+[x86_64-8.1.0-release-posix-seh-rt_v6-rev0 选择](https://nchc.dl.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/seh/x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z)
+
 # 网络访问 配置国内代理
 go env -w GOPROXY=https://goproxy.cn
 

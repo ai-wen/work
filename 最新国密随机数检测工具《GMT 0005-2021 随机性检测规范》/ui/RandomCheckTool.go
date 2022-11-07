@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"io/ioutil"
+	"math"
 	"os"
 	"path"
 	"path/filepath"
@@ -36,11 +38,18 @@ var failcnt = make([]int32, len(itemStr))
 
 var labelsetbit *ui.Label
 var labelsetNum *ui.Label
+var labelsetAlphaNum *ui.Label
 var labeltime *ui.Label
 var labeltimebegin *ui.Label
 var labeltimeend *ui.Label
 var buttonOK *ui.Button
 var setcnt int
+
+// Alpha 显著性水平α
+// AlphaT 分布均匀性的显著性水平
+// const AlphaT float64 = 0.0001
+var Alpha float64
+var entryAlpha *ui.Entry
 
 var entryPath *ui.Entry
 var entryOutPath *ui.Entry
@@ -246,7 +255,6 @@ func worker(jobs <-chan string, out chan<- *R) {
 
 //var lock sync.Mutex
 
-
 // 结果集写入文件工作器
 func resultWriter(in <-chan *R, w io.StringWriter, cnt []int32, wg *sync.WaitGroup) {
 	for r := range in {
@@ -255,7 +263,7 @@ func resultWriter(in <-chan *R, w io.StringWriter, cnt []int32, wg *sync.WaitGro
 		//lock.Lock()
 
 		for j := 0; j < len(r.P); j++ {
-			if r.P[j] >= 0.01 {
+			if r.P[j] >= Alpha {
 				atomic.AddInt32(&cnt[j], 1)
 				//崩溃
 				//labels_succ[selectslice[j]].SetText(fmt.Sprintf("%d", cnt[j]))
@@ -273,6 +281,8 @@ func resultWriter(in <-chan *R, w io.StringWriter, cnt []int32, wg *sync.WaitGro
 }
 
 func makeBasicControlsPage() ui.Control {
+
+	Alpha = 0.01
 
 	//垂直布局
 	hboxMain := ui.NewHorizontalBox()
@@ -307,8 +317,8 @@ func makeBasicControlsPage() ui.Control {
 	hbox.Append(vboxstat, true)
 
 	vboxleft.Append(ui.NewLabel("检测项"), false)
-	vboxright.Append(ui.NewLabel("成功样本数"), false)
-	vboxstat.Append(ui.NewLabel("失败样本数"), false)
+	vboxright.Append(ui.NewLabel(">=显著水平样本数"), false)
+	vboxstat.Append(ui.NewLabel("<显著水平样本数"), false)
 
 	seletctAll = true
 	for i := 0; i < len(itemStr); i++ {
@@ -345,7 +355,16 @@ func makeBasicControlsPage() ui.Control {
 		}
 	})
 
-	vbox.Append(buttonSelectAll, false)
+	hboxAl := ui.NewHorizontalBox()
+	hboxAl.SetPadded(true)
+	vbox.Append(hboxAl, false)
+
+	hboxAl.Append(buttonSelectAll, true)
+	hboxAl.Append(ui.NewLabel("显著水平:"), false)
+	entryAlpha = ui.NewEntry()
+	entryAlpha.SetReadOnly(true)
+	entryAlpha.SetText(fmt.Sprintf("%1.3f", Alpha))
+	hboxAl.Append(entryAlpha, false)
 
 	//右侧视图
 	vboxOp := ui.NewVerticalBox()
@@ -374,6 +393,13 @@ func makeBasicControlsPage() ui.Control {
 	hbox1.Append(labelsetNum, true)
 	vboxOp.Append(hbox1, false)
 
+	hbox1 = ui.NewHorizontalBox()
+	hbox1.SetPadded(true)
+	hbox1.Append(ui.NewLabel("成功通过检测项,需要>=显著水平的样本数量:"), true)
+	labelsetAlphaNum = ui.NewLabel("")
+	hbox1.Append(labelsetAlphaNum, true)
+	vboxOp.Append(hbox1, false)
+
 	//添加分割线
 	//vbox.Append(ui.NewHorizontalSeparator(), false)
 	vboxOp.Append(ui.NewHorizontalSeparator(), false)
@@ -388,30 +414,49 @@ func makeBasicControlsPage() ui.Control {
 	entryPath = ui.NewEntry()
 	entryPath.SetReadOnly(true)
 	button.OnClicked(func(*ui.Button) {
+		setcnt = 0
+
 		filename := ui.OpenFile(mainwin)
 		if filename != "" {
+			/*
+				filepath.Walk(filepath.Dir(filename), func(p string, _ fs.FileInfo, _ error) error {
+					if strings.HasSuffix(p, ".bin") || strings.HasSuffix(p, ".dat") {
+						setcnt++
+					}
+					return nil
+				})
+			*/
+			files, err := ioutil.ReadDir(filepath.Dir(filename))
+			if err == nil {
+				for _, file := range files {
+
+					if strings.HasSuffix(file.Name(), ".bin") || strings.HasSuffix(file.Name(), ".dat") {
+						setcnt++
+					}
+					//fmt.Println(file.Name())
+				}
+			}
+		}
+
+		if setcnt == 0 {
+			ui.MsgBoxError(mainwin, "国密随机数检测工具", "样本文件必须是 .dat 或 .bin文件")
+			labelsetAlphaNum.SetText("")
+			labelsetNum.SetText("")
+		} else {
+
 			entryPath.SetText(filename)
 			buf, _ := os.ReadFile(filename)
 			labelsetbit.SetText(fmt.Sprintf("%dbit %dbyte", len(buf)*8, len(buf)))
 
-			setcnt = 0
-			filepath.Walk(filepath.Dir(filename), func(p string, _ fs.FileInfo, _ error) error {
-				if strings.HasSuffix(p, ".bin") || strings.HasSuffix(p, ".dat") {
-					setcnt++
-				}
-				return nil
-			})
-
-			if setcnt == 0 {
-				ui.MsgBoxError(mainwin, "国密随机数检测工具", "样本文件必须是 .dat 或 .bin文件")
-			}
-
-			labelsetNum.SetText(fmt.Sprintf("%d", setcnt))
-
-			outpath := filepath.Dir(filename) + "/RandomnessTestReport.csv"
+			outpath := path.Join(filepath.Dir(filename), "/RandomnessTestReport.csv")
+			//outpath := filepath.Dir(filename) + "/RandomnessTestReport.csv"
 			_ = os.MkdirAll(filepath.Dir(outpath), os.FileMode(0600))
 
 			entryOutPath.SetText(outpath)
+			var num float64 = (1 - Alpha - 3*math.Sqrt(float64((Alpha*(1-Alpha))/float64(setcnt)))) * float64(setcnt)
+			//fmt.Printf("%f %d", num, int(math.Ceil(num)))
+			labelsetAlphaNum.SetText(fmt.Sprintf("%d", int(math.Ceil(num))))
+			labelsetNum.SetText(fmt.Sprintf("%d", setcnt))
 		}
 	})
 	hboxpath.Append(ui.NewLabel("样本路径:"), false)
@@ -518,7 +563,7 @@ func makeBasicControlsPage() ui.Control {
 							labels_succ[selectslice[j]].SetText(fmt.Sprintf("%d", cnt[j]))
 							labels_fail[selectslice[j]].SetText(fmt.Sprintf("%d", failcnt[j]))
 						}
-						
+
 						labeltime.SetText(time.Now().Format("2006.01.02 15:04:05"))
 						jobs <- p
 					}

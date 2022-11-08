@@ -1,0 +1,34 @@
+#define RT_MANIFEST 24
+
+1 VERSIONINFO
+FILEVERSION     1,0,0,0
+PRODUCTVERSION  1,4,0,0
+FILEFLAGSMASK   0X3FL
+FILEFLAGS       0L
+FILEOS          0X40004L
+FILETYPE        0X1
+FILESUBTYPE     0
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+			VALUE "ProductVersion", "v1.4.0.0"
+            VALUE "CompanyName", "北京实际龙脉科技有限公司"
+            VALUE "FileDescription", "随机数检测工具"
+            VALUE "FileVersion", "1.0.0.0"
+            VALUE "InternalName", "RandomCheckTool"
+            VALUE "LegalCopyright", "@ 北京实际龙脉科技有限公司. All rights reserved."
+            VALUE "OriginalFilename", "RandomCheckTool.EXE"
+            VALUE "ProductName", "随机数检测工具"
+			VALUE "ProductVersion", "1.4.0.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+            VALUE "Translation", 0x0409, 0x04B0
+    END
+END
+
+1 ICON "rc/logo.ico"
+

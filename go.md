@@ -1,6 +1,31 @@
 # 下载
 https://golang.google.cn/dl/
 
+# 编译
+go tool dist list 查看支持的交叉编译平台
+:::linux/386
+:::linux/amd64
+:::darwin/amd64
+:::darwin/arm64
+set CGO_ENABLED=0 
+set GOOS=linux 
+set GOARCH=amd64 
+
+## 静态编译
+go build 默认是静态编译
+当使用cgo时 会变成动态依赖
+1. CGO_ENABLED=0 关闭cgo,进行静态编译
+set CGO_ENABLED=1 当使用cgo时
+2. 采用external linker
+cmd/link 有两种工作模式：internal linking和external linking。
+go build -o RandomCheckTool -ldflags '-linkmode "external" -extldflags "-static"' RandomCheckTool.go
+如果在编译时出现以下错误：下载依赖即可
+/usr/local/go/pkg/tool/linux_amd64/link: running gcc failed: exit status 1
+/usr/bin/ld: 找不到 -lpthread
+/usr/bin/ld: 找不到 -lc
+yum install glibc-static.x86_64 -y
+
+
 # golang cgo windows mingw64 环境搭建
 MingW 分 32位和64位版本：下载地址分别如下：
 http://sourceforge.net/projects/mingw/

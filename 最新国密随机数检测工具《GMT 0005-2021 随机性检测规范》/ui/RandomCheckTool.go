@@ -10,7 +10,6 @@ import (
 	"path"
 	"path/filepath"
 	"runtime"
-	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -71,182 +70,156 @@ func worker(jobs <-chan string, out chan<- *R) {
 		buf = nil
 		arr := make([]float64, 0, len(selectslice))
 
-		var index int = 0
 
-		if selectArry[index] == 1 {
+		if selectArry[0] == 1 {
 			//"单比特频数检测"
 			p, _ := randomness.MonoBitFrequencyTest(bits)
 			arr = append(arr, p)
-		}
-		index++
+		}		
 
-		if selectArry[index] == 1 {
+		if selectArry[1] == 1 {
 			//"块内频数检测 m=10000"
 			p, _ := randomness.FrequencyWithinBlockTest(bits)
 			arr = append(arr, p)
-		}
-		index++
+		}		
 
-		if selectArry[index] == 1 {
+		if selectArry[2] == 1 {
 			//"扑克检测 m=4"
 			//"扑克检测 m=8"
 			p, _ := randomness.PokerProto(bits, 4)
 			arr = append(arr, p)
-		}
-		index++
+		}		
 
-		if selectArry[index] == 1 {
+		if selectArry[3] == 1 {
 			p, _ := randomness.PokerProto(bits, 8)
 			arr = append(arr, p)
-		}
-		index++
+		}		
 
-		if selectArry[index] == 1 || selectArry[index+1] == 1 {
+		if selectArry[4] == 1 || selectArry[5] == 1 {
 			//"重叠子序列检测 m=3 P1"
 			//"重叠子序列检测 m=3 P2"
 			//"重叠子序列检测 m=5 P1"
 			//"重叠子序列检测 m=5 P2"
 			p1, p2, _, _ := randomness.OverlappingTemplateMatchingProto(bits, 3)
-			if selectArry[index] == 1 {
+			if selectArry[4] == 1 {
 				arr = append(arr, p1)
 			}
-			if selectArry[index+1] == 1 {
+			if selectArry[5] == 1 {
 				arr = append(arr, p2)
 			}
 		}
-		index++
-		index++
 
-		if selectArry[index] == 1 || selectArry[index+1] == 1 {
+		if selectArry[6] == 1 || selectArry[7] == 1 {
 			p1, p2, _, _ := randomness.OverlappingTemplateMatchingProto(bits, 5)
-			if selectArry[index] == 1 {
+			if selectArry[6] == 1 {
 				arr = append(arr, p1)
 			}
-			if selectArry[index+1] == 1 {
+			if selectArry[7] == 1 {
 				arr = append(arr, p2)
 			}
 		}
-		index++
-		index++
 
-		if selectArry[index] == 1 {
+		if selectArry[8] == 1 {
 			//"游程总数检测"
 			//"游程分布检测"
 			//"块内最大游程检测 m=10000"
 			p, _ := randomness.RunsTest(bits)
 			arr = append(arr, p)
-		}
-		index++
+		}		
 
-		if selectArry[index] == 1 {
+		if selectArry[9] == 1 {
 			p, _ := randomness.RunsDistributionTest(bits)
 			arr = append(arr, p)
-		}
-		index++
+		}		
 
-		if selectArry[index] == 1 {
+		if selectArry[10] == 1 {
 			p, _ := randomness.LongestRunOfOnesInABlockTest(bits, true)
 			arr = append(arr, p)
-		}
-		index++
+		}		
 
-		if selectArry[index] == 1 {
+		if selectArry[11] == 1 {
 			//"二元推导检测 k=3"
 			//"二元推导检测 k=7"
 			p, _ := randomness.BinaryDerivativeProto(bits, 3)
 			arr = append(arr, p)
-		}
-		index++
+		}		
 
-		if selectArry[index] == 1 {
+		if selectArry[12] == 1 {
 			p, _ := randomness.BinaryDerivativeProto(bits, 7)
 			arr = append(arr, p)
-		}
-		index++
+		}		
 
-		if selectArry[index] == 1 {
+		if selectArry[13] == 1 {
 			//"自相关检测 d=1"
 			//"自相关检测 d=2"
 			//"自相关检测d=8"
 			//"自相关检测 d=16"
 			p, _ := randomness.AutocorrelationProto(bits, 1)
 			arr = append(arr, p)
-		}
-		index++
+		}		
 
-		if selectArry[index] == 1 {
+		if selectArry[14] == 1 {
 			p, _ := randomness.AutocorrelationProto(bits, 2)
 			arr = append(arr, p)
-		}
-		index++
+		}		
 
-		if selectArry[index] == 1 {
+		if selectArry[15] == 1 {
 			p, _ := randomness.AutocorrelationProto(bits, 8)
 			arr = append(arr, p)
-		}
-		index++
+		}		
 
-		if selectArry[index] == 1 {
+		if selectArry[16] == 1 {
 			p, _ := randomness.AutocorrelationProto(bits, 16)
 			arr = append(arr, p)
-		}
-		index++
+		}		
 
-		if selectArry[index] == 1 {
+		if selectArry[17] == 1 {
 			//"矩阵秩检测"
 			p, _ := randomness.MatrixRankTest(bits)
 			arr = append(arr, p)
-		}
-		index++
+		}		
 
-		if selectArry[index] == 1 {
+		if selectArry[18] == 1 {
 			//"累加和检测"
 			p, _ := randomness.CumulativeTest(bits, true)
 			arr = append(arr, p)
-		}
-		index++
+		}		
 
-		if selectArry[index] == 1 {
+		if selectArry[19] == 1 {
 			//"近似熵检测 m=2"
 			//"近似熵检测 m=5"
 			p, _ := randomness.ApproximateEntropyProto(bits, 2)
 			arr = append(arr, p)
-		}
-		index++
+		}		
 
-		if selectArry[index] == 1 {
+		if selectArry[20] == 1 {
 			p, _ := randomness.ApproximateEntropyProto(bits, 5)
 			arr = append(arr, p)
-		}
-		index++
+		}		
 
-		if selectArry[index] == 1 {
+		if selectArry[21] == 1 {
 			//"线性复杂度检测 m=500"
 			//"线性复杂度检测 m=1000"
 			p, _ := randomness.LinearComplexityProto(bits, 500)
 			arr = append(arr, p)
-		}
-		index++
+		}		
 
-		if selectArry[index] == 1 {
+		if selectArry[22] == 1 {
 			p, _ := randomness.LinearComplexityProto(bits, 1000)
 			arr = append(arr, p)
-		}
-		index++
+		}		
 
-		if selectArry[index] == 1 {
+		if selectArry[23] == 1 {
 			//"Maurer通用统计检测 L=7 Q=1280"
 			p, _ := randomness.MaurerUniversalTest(bits)
 			arr = append(arr, p)
-		}
-		index++
+		}		
 
-		if selectArry[index] == 1 {
+		if selectArry[24] == 1 {
 			//"离散傅里叶检测"
 			p, _ := randomness.DiscreteFourierTransformTest(bits)
 			arr = append(arr, p)
 		}
-		index++
 
 		go func(file string) {
 			out <- &R{path.Base(file), arr}
@@ -264,7 +237,7 @@ func resultWriter(in <-chan *R, w io.StringWriter, cnt []int32, wg *sync.WaitGro
 		//lock.Lock()
 
 		for j := 0; j < len(r.P); j++ {
-			if r.P[j] >= Alpha {
+			if r.P[j] >= 0.01 {
 				atomic.AddInt32(&cnt[j], 1)
 				//崩溃
 				//labels_succ[selectslice[j]].SetText(fmt.Sprintf("%d", cnt[j]))
@@ -478,7 +451,7 @@ func makeBasicControlsPage() ui.Control {
 		if filename != "" {
 
 			buttonOK.Disable()
-
+			button.Disable()
 			_ = os.MkdirAll(filepath.Dir(filename), os.FileMode(0600))
 
 			selectslice = selectslice[0:0]
@@ -510,6 +483,7 @@ func makeBasicControlsPage() ui.Control {
 					fmt.Printf(">> 请选择样本文件")
 					ui.MsgBoxError(mainwin, "国密随机数检测工具", "请选择样本文件 ")
 					buttonOK.Enable()
+					button.Enable()
 					return
 				}
 
@@ -520,6 +494,7 @@ func makeBasicControlsPage() ui.Control {
 					fmt.Printf(">> 无法打开写入报告文件")
 					ui.MsgBoxError(mainwin, "国密随机数检测工具", "无法打开写入文件 "+reportPath)
 					buttonOK.Enable()
+					button.Enable()
 					return
 				}
 				defer w.Close()
@@ -590,27 +565,33 @@ func makeBasicControlsPage() ui.Control {
 				labeltime.SetText(fmt.Sprintf("%d 分钟 %d 秒", elapsedTime/60, elapsedTime%60))
 				labeltimeend.SetText(time.Now().Format("2006.01.02 15:04:05"))
 
+				for j := 0; j < len(selectslice); j++ {
+					labels_succ[selectslice[j]].SetText(fmt.Sprintf("%d", cnt[j]))
+					labels_fail[selectslice[j]].SetText(fmt.Sprintf("%d", failcnt[j]))
+				}
+
 				var errStr string
 				var numCount int = 0
 				//通过的组数
-				var numpass int = int(math.Ceil((1 - Alpha - 3*math.Sqrt(float64((Alpha*(1-Alpha))/float64(setcnt)))) * float64(setcnt)))
+				var numpass int32 = int32(math.Ceil((1 - Alpha - 3*math.Sqrt(float64((Alpha*(1-Alpha))/float64(setcnt)))) * float64(setcnt)))
 				for j := 0; j < len(selectslice); j++ {
 
-					num, _ := strconv.Atoi(labels_succ[selectslice[j]].Text())
-					if num < numpass {
+					//num, _ := strconv.Atoi(labels_succ[selectslice[j]].Text())
+					if cnt[j] < numpass {
 						numCount++
 						errStr += itemStr[selectslice[j]]
-						errStr += ","
+						errStr += ",\n"
 					}
 				}
 
 				if 0 == numCount {
 					ui.MsgBox(mainwin, "成功", "所有检测项全部通过")
 				} else {
-					ui.MsgBoxError(mainwin, "失败", fmt.Sprintf("有%d项检测未通过:%s", numCount, errStr))
+					ui.MsgBoxError(mainwin, "失败", fmt.Sprintf("有%d项检测未通过:%s\n", numCount, errStr))
 				}
 
 				buttonOK.Enable()
+				button.Enable()
 			}()
 		}
 	})

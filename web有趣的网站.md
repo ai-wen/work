@@ -43,3 +43,9 @@ PCT国际专利合作条约（Patent Cooperation Treaty）。
 ### [7.111736902基于SIMD指令的SM4的并行计算方法及装置、可读存储介质](https://patentscope.wipo.int/search/zh/detail.jsf?docId=CN308334753&_cid=P22-L4YZMV-40346-1)
 ### [9.109417468安全高效的分组密码算法实现的方法与装置](https://patentscope.wipo.int/search/zh/detail.jsf?docId=CN239256066&_cid=P22-L4YZMV-40346-1)
 
+
+
+
+
+# 在线汇编
+https://godbolt.org/

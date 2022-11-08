@@ -84,13 +84,13 @@ func worker(jobs <-chan string, out chan<- *R) {
 		}
 
 		if selectArry[1] == 1 {
-			//"块内频数检测 m=10000"
+			//"块内频数检测 m=10000" 10  100 1000 10000 1000000 根据长度自动选择
 			p, _ := randomness.FrequencyWithinBlockTest(bits)
 			arr = append(arr, p)
 		}
 
 		if selectArry[2] == 1 {
-			//"扑克检测 m=4"
+			//"扑克检测 m=4"  至少8字节
 			//"扑克检测 m=8"
 			p, _ := randomness.PokerProto(bits, 4)
 			arr = append(arr, p)
@@ -137,6 +137,7 @@ func worker(jobs <-chan string, out chan<- *R) {
 			arr = append(arr, p)
 		}
 
+		//至少128字节
 		if selectArry[10] == 1 {
 			//"块内最大1游程检测 m=10000"
 			p, _ := randomness.LongestRunOfOnesInABlockTest(bits, true)
@@ -150,7 +151,7 @@ func worker(jobs <-chan string, out chan<- *R) {
 		}
 
 		if selectArry[12] == 1 {
-			//"二元推导检测 k=3"
+			//"二元推导检测 k=3" 至少7字节
 			p, _ := randomness.BinaryDerivativeProto(bits, 3)
 			arr = append(arr, p)
 		}
@@ -165,7 +166,7 @@ func worker(jobs <-chan string, out chan<- *R) {
 			//"自相关检测 d=1"
 			//"自相关检测 d=2"
 			//"自相关检测d=8"
-			//"自相关检测 d=16"
+			//"自相关检测 d=16" 至少16字节
 			p, _ := randomness.AutocorrelationProto(bits, 1)
 			arr = append(arr, p)
 		}
@@ -419,7 +420,8 @@ func makeBasicControlsPage() ui.Control {
 	entryPath.SetReadOnly(true)
 	buttonFile.OnClicked(func(*ui.Button) {
 		setcnt = 0
-
+		entryPath.SetText("")
+		entryOutPath.SetText("")
 		filename := ui.OpenFile(mainwin)
 		if filename != "" {
 			files, err := ioutil.ReadDir(filepath.Dir(filename))
@@ -439,24 +441,25 @@ func makeBasicControlsPage() ui.Control {
 			labelsetNum.SetText("")
 		} else {
 
-			entryPath.SetText(filename)
 			buf, _ := os.ReadFile(filename)
 			labelsetbit.SetText(fmt.Sprintf("%dbit %dbyte", len(buf)*8, len(buf)))
 
 			if len(buf) < (7 * 1280) {
-				checkboxs[25].SetChecked(false)
+				//checkboxs[25].SetChecked(false)
 				ui.MsgBoxError(mainwin, "随机数检测工具", fmt.Sprintf("Maurer通用统计检测 数据长度至少要满足 L*Q %dbyte", 7*1280))
+				setcnt = 0
+			} else {
+				entryPath.SetText(filename)
+				outpath := path.Join(filepath.Dir(filepath.Dir(filename)), "/RandomnessTestReport.csv")
+				//outpath := filepath.Dir(filename) + "/RandomnessTestReport.csv"
+				_ = os.MkdirAll(filepath.Dir(outpath), os.FileMode(0600))
+
+				entryOutPath.SetText(outpath)
+				var num float64 = (1 - Alpha - 3*math.Sqrt(float64((Alpha*(1-Alpha))/float64(setcnt)))) * float64(setcnt)
+				//fmt.Printf("%f %d", num, int(math.Ceil(num)))
+				labelsetAlphaNum.SetText(fmt.Sprintf("%d", int(math.Ceil(num))))
+				labelsetNum.SetText(fmt.Sprintf("%d", setcnt))
 			}
-
-			outpath := path.Join(filepath.Dir(filepath.Dir(filename)), "/RandomnessTestReport.csv")
-			//outpath := filepath.Dir(filename) + "/RandomnessTestReport.csv"
-			_ = os.MkdirAll(filepath.Dir(outpath), os.FileMode(0600))
-
-			entryOutPath.SetText(outpath)
-			var num float64 = (1 - Alpha - 3*math.Sqrt(float64((Alpha*(1-Alpha))/float64(setcnt)))) * float64(setcnt)
-			//fmt.Printf("%f %d", num, int(math.Ceil(num)))
-			labelsetAlphaNum.SetText(fmt.Sprintf("%d", int(math.Ceil(num))))
-			labelsetNum.SetText(fmt.Sprintf("%d", setcnt))
 		}
 	})
 	hboxpath.Append(ui.NewLabel("样本路径:"), false)

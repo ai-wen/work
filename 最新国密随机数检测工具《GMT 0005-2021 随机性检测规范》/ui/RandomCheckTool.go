@@ -634,7 +634,7 @@ func makeBasicControlsPage() ui.Control {
 		0, 1, 1, 1,
 		true, ui.AlignCenter, false, ui.AlignCenter)
 
-	grid.Append(ui.NewLabel("北京世纪龙脉科技有限公司"),
+	grid.Append(ui.NewLabel("北京世纪龙脉科技有限公司 V1.0"),
 		0, 2, 1, 1,
 		true, ui.AlignCenter, true, ui.AlignCenter)
 

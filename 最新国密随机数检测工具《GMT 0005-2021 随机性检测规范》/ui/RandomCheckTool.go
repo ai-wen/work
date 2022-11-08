@@ -627,14 +627,14 @@ func makeBasicControlsPage() ui.Control {
 	grid := ui.NewGrid()
 	grid.SetPadded(false)
 
-	grid.Append(ui.NewLabel("最新国密随机数质量检测工具,支持《GMT 0005-2021 随机性检测规范》。"),
+	grid.Append(ui.NewLabel("国密随机数质量检测工具,支持《GMT 0005-2021 随机性检测规范》。"),
 		0, 0, 1, 1,
 		true, ui.AlignCenter, true, ui.AlignCenter)
-	grid.Append(ui.NewLabel("充分利用多核cpu进行检测,大大缩短检测时间。"),
+	grid.Append(ui.NewLabel("利用多核CPU进行检测,大大缩短检测时间。"),
 		0, 1, 1, 1,
 		true, ui.AlignCenter, false, ui.AlignCenter)
 
-	grid.Append(ui.NewLabel("北京世纪龙脉科技有限公司 V1.0"),
+	grid.Append(ui.NewLabel("北京世纪龙脉科技有限公司 V1.1"),
 		0, 2, 1, 1,
 		true, ui.AlignCenter, true, ui.AlignCenter)
 

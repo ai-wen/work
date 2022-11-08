@@ -384,6 +384,7 @@ func makeBasicControlsPage() ui.Control {
 	vboxOp.Append(prosessbar, true)
 
 	//其他
+	vboxOp.Append(ui.NewLabel("建议使用1000*1000 或者1024*1024 bit大小的样本进行检测。"), false)
 	hbox1 := ui.NewHorizontalBox()
 	hbox1.SetPadded(true)
 	hbox1.Append(ui.NewLabel("单样本大小:"), true)

@@ -25,9 +25,9 @@ import (
 
 var mainwin *ui.Window
 
-var itemStr = [25]string{"单比特频数检测", "块内频数检测 m=10000", "扑克检测 m=4", "扑克检测 m=8", "重叠子序列检测 m=3 P1", "重叠子序列检测 m=3 P2", "重叠子序列检测 m=5 P1", "重叠子序列检测 m=5 P2", "游程总数检测", "游程分布检测", "块内最大游程检测 m=10000", "二元推导检测 k=3", "二元推导检测 k=7", "自相关检测 d=1", "自相关检测 d=2", "自相关检测d=8", "自相关检测 d=16", "矩阵秩检测", "累加和检测", "近似熵检测 m=2", "近似熵检测 m=5", "线性复杂度检测 m=500", "线性复杂度检测 m=1000", "Maurer通用统计检测 L=7 Q=1280", "离散傅里叶检测"}
+var itemStr = [27]string{"单比特频数检测", "块内频数检测 m=10000", "扑克检测 m=4", "扑克检测 m=8", "重叠子序列检测 m=3 P1", "重叠子序列检测 m=3 P2", "重叠子序列检测 m=5 P1", "重叠子序列检测 m=5 P2", "游程总数检测", "游程分布检测", "块内最大1游程检测 m=10000","块内最大0游程检测 m=10000",  "二元推导检测 k=3", "二元推导检测 k=7", "自相关检测 d=1", "自相关检测 d=2", "自相关检测 d=8", "自相关检测 d=16", "矩阵秩检测", "累加和前向检测","累加和后向检测", "近似熵检测 m=2", "近似熵检测 m=5", "线性复杂度检测 m=500", "线性复杂度检测 m=1000", "Maurer通用统计检测 L=7 Q=1280", "离散傅里叶检测"}
 
-var selectArry [25]int
+var selectArry [len(itemStr)]int
 var selectslice []int
 
 var checkboxs [len(itemStr)]*ui.Checkbox
@@ -120,36 +120,42 @@ func worker(jobs <-chan string, out chan<- *R) {
 		}
 
 		if selectArry[8] == 1 {
-			//"游程总数检测"
-			//"游程分布检测"
-			//"块内最大游程检测 m=10000"
+			//"游程总数检测"			
 			p, _ := randomness.RunsTest(bits)
 			arr = append(arr, p)
 		}		
 
 		if selectArry[9] == 1 {
+			//"游程分布检测"			
 			p, _ := randomness.RunsDistributionTest(bits)
 			arr = append(arr, p)
 		}		
 
 		if selectArry[10] == 1 {
+			//"块内最大1游程检测 m=10000"
 			p, _ := randomness.LongestRunOfOnesInABlockTest(bits, true)
 			arr = append(arr, p)
 		}		
 
 		if selectArry[11] == 1 {
-			//"二元推导检测 k=3"
-			//"二元推导检测 k=7"
-			p, _ := randomness.BinaryDerivativeProto(bits, 3)
+			//"块内最大0游程检测 m=10000"
+			p, _ := randomness.LongestRunOfOnesInABlockTest(bits, false)
 			arr = append(arr, p)
 		}		
 
 		if selectArry[12] == 1 {
-			p, _ := randomness.BinaryDerivativeProto(bits, 7)
+			//"二元推导检测 k=3"			
+			p, _ := randomness.BinaryDerivativeProto(bits, 3)
 			arr = append(arr, p)
 		}		
 
 		if selectArry[13] == 1 {
+			//"二元推导检测 k=7"
+			p, _ := randomness.BinaryDerivativeProto(bits, 7)
+			arr = append(arr, p)
+		}		
+
+		if selectArry[14] == 1 {
 			//"自相关检测 d=1"
 			//"自相关检测 d=2"
 			//"自相关检测d=8"
@@ -158,64 +164,69 @@ func worker(jobs <-chan string, out chan<- *R) {
 			arr = append(arr, p)
 		}		
 
-		if selectArry[14] == 1 {
+		if selectArry[15] == 1 {
 			p, _ := randomness.AutocorrelationProto(bits, 2)
 			arr = append(arr, p)
 		}		
 
-		if selectArry[15] == 1 {
+		if selectArry[16] == 1 {
 			p, _ := randomness.AutocorrelationProto(bits, 8)
 			arr = append(arr, p)
 		}		
 
-		if selectArry[16] == 1 {
+		if selectArry[17] == 1 {
 			p, _ := randomness.AutocorrelationProto(bits, 16)
 			arr = append(arr, p)
 		}		
 
-		if selectArry[17] == 1 {
+		if selectArry[18] == 1 {
 			//"矩阵秩检测"
 			p, _ := randomness.MatrixRankTest(bits)
 			arr = append(arr, p)
 		}		
 
-		if selectArry[18] == 1 {
-			//"累加和检测"
+		if selectArry[19] == 1 {
+			//"累加和检测"  前向
 			p, _ := randomness.CumulativeTest(bits, true)
 			arr = append(arr, p)
 		}		
+		if selectArry[20] == 1 {
+			//"累加和检测"  后向
+			p, _ := randomness.CumulativeTest(bits, false)
+			arr = append(arr, p)
+		}	
 
-		if selectArry[19] == 1 {
+		if selectArry[21] == 1 {
 			//"近似熵检测 m=2"
 			//"近似熵检测 m=5"
 			p, _ := randomness.ApproximateEntropyProto(bits, 2)
 			arr = append(arr, p)
 		}		
 
-		if selectArry[20] == 1 {
+		if selectArry[22] == 1 {
 			p, _ := randomness.ApproximateEntropyProto(bits, 5)
 			arr = append(arr, p)
 		}		
 
-		if selectArry[21] == 1 {
+		if selectArry[23] == 1 {
 			//"线性复杂度检测 m=500"
 			//"线性复杂度检测 m=1000"
 			p, _ := randomness.LinearComplexityProto(bits, 500)
 			arr = append(arr, p)
 		}		
 
-		if selectArry[22] == 1 {
+		if selectArry[24] == 1 {
 			p, _ := randomness.LinearComplexityProto(bits, 1000)
 			arr = append(arr, p)
 		}		
 
-		if selectArry[23] == 1 {
+		if selectArry[25] == 1 {
 			//"Maurer通用统计检测 L=7 Q=1280"
 			p, _ := randomness.MaurerUniversalTest(bits)
 			arr = append(arr, p)
 		}		
 
-		if selectArry[24] == 1 {
+		if selectArry[26] == 1 {
 			//"离散傅里叶检测"
 			p, _ := randomness.DiscreteFourierTransformTest(bits)
 			arr = append(arr, p)
@@ -634,7 +645,7 @@ func makeBasicControlsPage() ui.Control {
 		0, 1, 1, 1,
 		true, ui.AlignCenter, false, ui.AlignCenter)
 
-	grid.Append(ui.NewLabel("北京世纪龙脉科技有限公司 V1.1"),
+	grid.Append(ui.NewLabel("北京世纪龙脉科技有限公司 V1.2"),
 		0, 2, 1, 1,
 		true, ui.AlignCenter, true, ui.AlignCenter)
 

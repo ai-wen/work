@@ -25,6 +25,14 @@ go build -o RandomCheckTool -ldflags '-linkmode "external" -extldflags "-static"
 /usr/bin/ld: 找不到 -lc
 yum install glibc-static.x86_64 -y
 
+apt-get install libc6-dev
+apt-get install glibc-static
+
+export CGO_LDFLAGS='-g -O2'
+
+export CGO_LDFLAGS='-g -O2 -linkmode "external" -extldflags "-static"'
+
+
 
 # golang cgo windows mingw64 环境搭建
 MingW 分 32位和64位版本：下载地址分别如下：

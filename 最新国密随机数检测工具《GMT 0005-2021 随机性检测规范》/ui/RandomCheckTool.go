@@ -775,3 +775,32 @@ func main() {
 
 //其它
 //go get github.com/josephspurrier/goversioninfo/cmd/goversioninfo
+
+//编译andlabs/libui
+//apt-get install ninja-build
+//pip3 install --user meson
+
+//export PATH=$PATH:/root/.local/bin
+
+//cd /usr/local
+//wget --no-check-certificate https://www.python.org/ftp/python/3.6.5/Python-3.6.5.tgz
+//wget --no-check-certificate https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tgz
+//tar -xzvf Python-3.6.5.tgz
+//cd Python-3.6.5
+//./configure --prefix=/usr/local/python3.6.5
+//make
+//make install
+//cp /usr/bin/python3 /usr/bin/python3_bak
+//rm /usr/bin/python3
+//ln -s /usr/local/Python-3.6.5/python /usr/bin/python3
+
+//wget https://bootstrap.pypa.io/pip/3.6/get-pip.py
+//python3 get-pip.py
+
+//grep 取行，awk 按条件取指定列，cut 按分隔符取指定列。
+//sed主要是用来将数据进行选取、替换、删除、新增的命令。可以放在管道符之后处理。
+
+// ldd RandomCheckTool | cut -d ">" -f 2 |cut -d "(" -f 1
+//cp $(ldd RandomCheckTool | cut -d ">" -f 2 |cut -d "(" -f 1 ) lib/
+//ll $(ldd RandomCheckTool | cut -d ">" -f 2 |cut -d "(" -f 1 )
+//ll $(ldd RandomCheckTool | cut -d ">" -f 2 |cut -d "(" -f 1 ) | awk '{print $11,$10,$9}' | cut -d '>' -f 2

@@ -523,6 +523,11 @@ func makeBasicControlsPage() ui.Control {
 				out := make(chan *R)
 				jobs := make(chan string)
 
+				//8核心一下的cpu使用一半的线程数
+				if n <= 8 {
+					n = n / 2
+				}
+
 				w, err := os.OpenFile(reportPath, os.O_RDWR|os.O_TRUNC|os.O_CREATE, os.FileMode(0600))
 				if err != nil {
 					fmt.Printf(">> 无法打开写入报告文件")

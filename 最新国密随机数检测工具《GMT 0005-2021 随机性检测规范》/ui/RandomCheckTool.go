@@ -62,8 +62,6 @@ var prosessbar *ui.ProgressBar
 
 var seletctAll bool
 
-var running int32
-
 type R struct {
 	Name string
 	P    []float64
@@ -250,8 +248,6 @@ func resultWriter(in <-chan *R, w io.StringWriter, cnt []int32, wg *sync.WaitGro
 	for r := range in {
 		_, _ = w.WriteString(r.Name)
 
-		//lock.Lock()
-
 		for j := 0; j < len(r.P); j++ {
 			if r.P[j] >= 0.01 {
 				atomic.AddInt32(&cnt[j], 1)
@@ -384,10 +380,10 @@ func makeBasicControlsPage() ui.Control {
 	vboxOp.Append(prosessbar, true)
 
 	//其他
-	vboxOp.Append(ui.NewLabel("建议使用1000*1000 或者1024*1024 bit大小的样本进行检测。"), false)
+	vboxOp.Append(ui.NewLabel("建议使用1000*1000 bit 或者128kb大小的样本进行检测。"), false)
 	hbox1 := ui.NewHorizontalBox()
 	hbox1.SetPadded(true)
-	hbox1.Append(ui.NewLabel("单样本大小:"), true)
+	hbox1.Append(ui.NewLabel("样本大小:"), true)
 	labelsetbit = ui.NewLabel("")
 	hbox1.Append(labelsetbit, true)
 	vboxOp.Append(hbox1, false)
@@ -450,8 +446,13 @@ func makeBasicControlsPage() ui.Control {
 				ui.MsgBoxError(mainwin, "随机数检测工具", fmt.Sprintf("Maurer通用统计检测 数据长度至少要满足 L*Q %dbyte", 7*1280))
 				setcnt = 0
 			} else {
-				entryPath.SetText(filename)
-				outpath := path.Join(filepath.Dir(filepath.Dir(filename)), "/RandomnessTestReport.csv")
+
+				if setcnt == 1 {
+					entryPath.SetText(filename)
+				} else {
+					entryPath.SetText(filepath.Dir(filename))
+				}
+				outpath := path.Join(filepath.Dir(filepath.Dir(filename)), "/LMRandomCheckReport"+time.Now().Format("2006_01_02_15_04_05")+".csv")
 				//outpath := filepath.Dir(filename) + "/RandomnessTestReport.csv"
 				_ = os.MkdirAll(filepath.Dir(outpath), os.FileMode(0600))
 
@@ -481,9 +482,6 @@ func makeBasicControlsPage() ui.Control {
 
 		if filename != "" {
 
-			buttonOK.Disable()
-			buttonFile.Disable()
-
 			for j := 0; j < len(itemStr); j++ {
 				labels_succ[j].SetText("0")
 				labels_fail[j].SetText("0")
@@ -510,11 +508,16 @@ func makeBasicControlsPage() ui.Control {
 
 			inputPath = entryPath.Text()
 
-			inputPath = filepath.Dir(inputPath)
+			if setcnt == 1 {
+				inputPath = filepath.Dir(inputPath)
+			}
 			reportPath = entryOutPath.Text()
 
 			startTime = time.Now()
 			labeltimebegin.SetText(startTime.Format("2006.01.02 15:04:05"))
+
+			buttonOK.Disable()
+			buttonFile.Disable()
 
 			//线程
 			go func() {
@@ -523,16 +526,20 @@ func makeBasicControlsPage() ui.Control {
 				out := make(chan *R)
 				jobs := make(chan string)
 
-				//8核心一下的cpu使用一半的线程数
-				if n <= 8 {
-					n = n / 2
-				}
-
+				/*
+					//8核心一下的cpu使用一半的线程数
+					if n <= 8 {
+						n = n / 2
+					}
+				*/
 				w, err := os.OpenFile(reportPath, os.O_RDWR|os.O_TRUNC|os.O_CREATE, os.FileMode(0600))
 				if err != nil {
 					fmt.Printf(">> 无法打开写入报告文件")
-					//ui.MsgBoxError(mainwin, "随机数检测工具", "无法打开写入文件 "+reportPath)
-					running = 0
+					ui.QueueMain(func() {
+						ui.MsgBoxError(mainwin, "随机数检测工具", "无法打开写入文件 "+reportPath)
+						buttonOK.Enable()
+						buttonFile.Enable()
+					})
 					return
 				}
 				defer w.Close()
@@ -549,24 +556,19 @@ func makeBasicControlsPage() ui.Control {
 				reportheader = StrToGBK(reportheader)
 				_, _ = w.WriteString(reportheader)
 
-				processfile = 0
-				if setcnt > 100 {
-					percent = int32(setcnt / 100)
-				} else {
-					percent = int32(100 / setcnt)
-				}
-
 				files, err := ioutil.ReadDir(inputPath)
 				if err != nil {
-					//ui.MsgBoxError(mainwin, "随机数检测工具", "打开写入文件失败")
-					running = 0
+					ui.QueueMain(func() {
+						ui.MsgBoxError(mainwin, "随机数检测工具", "读取随机数目录失败"+inputPath)
+						buttonOK.Enable()
+						buttonFile.Enable()
+					})
+
 					return
 				}
 
 				var wg sync.WaitGroup
 				cnt = make([]int32, len(selectslice))
-
-				running = 1
 
 				wg.Add(setcnt)
 
@@ -577,11 +579,48 @@ func makeBasicControlsPage() ui.Control {
 					go worker(jobs, out)
 				}
 
+				processfile = 0
+				if setcnt > 100 {
+					percent = int32(setcnt / 100)
+				}
+
 				// 结果工作器
 				for _, file := range files {
 					if strings.HasSuffix(file.Name(), ".bin") || strings.HasSuffix(file.Name(), ".dat") {
 
 						atomic.AddInt32(&processfile, 1)
+						if setcnt > 100 {
+							ui.QueueMain(func() {
+								//减少刷新次数
+								if 0 == processfile%40 {
+									prosessbar.SetValue(int(processfile / percent))
+									labeltimeend.SetText(time.Now().Format("2006.01.02 15:04:05"))
+									for j := 0; j < len(selectslice); j++ {
+										labels_succ[selectslice[j]].SetText(fmt.Sprintf("%d", cnt[j]))
+										labels_fail[selectslice[j]].SetText(fmt.Sprintf("%d", failcnt[j]))
+									}
+								}
+
+							})
+
+						} else {
+							ui.QueueMain(func() {
+								if 0 == processfile%10 {
+									for j := 0; j < len(selectslice); j++ {
+										labels_succ[selectslice[j]].SetText(fmt.Sprintf("%d", cnt[j]))
+										labels_fail[selectslice[j]].SetText(fmt.Sprintf("%d", failcnt[j]))
+									}
+								}
+
+								if setcnt < 10 {
+									prosessbar.SetValue(int(processfile * 9))
+								} else if setcnt < 20 {
+									prosessbar.SetValue(int(processfile + 20))
+								} else if setcnt < 50 {
+									prosessbar.SetValue(int(processfile + 50))
+								}
+							})
+						}
 
 						jobs <- (path.Join(inputPath, "/", file.Name()))
 					}
@@ -589,7 +628,44 @@ func makeBasicControlsPage() ui.Control {
 
 				wg.Wait()
 
-				running = 0
+				ui.QueueMain(func() {
+
+					elapsedTime := time.Since(startTime) / time.Second // duration in s
+					labeltime.SetText(fmt.Sprintf("%d 分钟 %d 秒", elapsedTime/60, elapsedTime%60))
+					labeltimeend.SetText(time.Now().Format("2006.01.02 15:04:05"))
+
+					for j := 0; j < len(selectslice); j++ {
+						labels_succ[selectslice[j]].SetText(fmt.Sprintf("%d", cnt[j]))
+						labels_fail[selectslice[j]].SetText(fmt.Sprintf("%d", failcnt[j]))
+					}
+
+					var errStr string
+					var numCount int = 0
+					//通过的组数
+					var numpass int32 = int32(math.Ceil((1 - Alpha - 3*math.Sqrt(float64((Alpha*(1-Alpha))/float64(setcnt)))) * float64(setcnt)))
+					for j := 0; j < len(selectslice); j++ {
+
+						if cnt[j] < numpass {
+							numCount++
+							errStr += itemStr[selectslice[j]]
+							errStr += ",\n"
+						}
+					}
+
+					prosessbar.SetValue(100)
+					buttonOK.Enable()
+					buttonFile.Enable()
+
+					if 0 == numCount {
+						ui.MsgBox(mainwin, "成功", "所有检测项全部通过")
+					} else {
+						ui.MsgBoxError(mainwin, "失败", fmt.Sprintf("有%d项检测未通过:%s\n", numCount, errStr))
+					}
+
+					processfile = 0
+					percent = 1
+
+				})
 
 				reportheader = "总计"
 				reportheader = StrToGBK(reportheader)
@@ -644,11 +720,10 @@ func makeBasicControlsPage() ui.Control {
 		0, 1, 1, 1,
 		true, ui.AlignCenter, false, ui.AlignCenter)
 
-	grid.Append(ui.NewLabel("北京世纪龙脉科技有限公司 V1.4"),
+	grid.Append(ui.NewLabel("北京世纪龙脉科技有限公司 V1.5"),
 		0, 2, 1, 1,
 		true, ui.AlignCenter, true, ui.AlignCenter)
 
-	//vbox.Append(grid, false)
 	vboxOp.Append(grid, true)
 
 	return hboxMain
@@ -673,77 +748,9 @@ func setupUI() {
 	tab.SetMargined(0, true)
 
 	mainwin.Show()
-	go counter()
 }
 
-func counter() {
-
-	for {
-		time.Sleep(1 * time.Second)
-
-		ui.QueueMain(func() {
-
-			if 1 == running {
-
-				if setcnt > 100 {
-					prosessbar.SetValue(int(processfile / percent))
-				} else {
-					prosessbar.SetValue(int(processfile * percent))
-				}
-
-				labeltimeend.SetText(time.Now().Format("2006.01.02 15:04:05"))
-				for j := 0; j < len(selectslice); j++ {
-					labels_succ[selectslice[j]].SetText(fmt.Sprintf("%d", cnt[j]))
-					labels_fail[selectslice[j]].SetText(fmt.Sprintf("%d", failcnt[j]))
-				}
-			} else if 0 == running {
-
-				prosessbar.SetValue(100)
-
-				elapsedTime := time.Since(startTime) / time.Second // duration in s
-				labeltime.SetText(fmt.Sprintf("%d 分钟 %d 秒", elapsedTime/60, elapsedTime%60))
-				labeltimeend.SetText(time.Now().Format("2006.01.02 15:04:05"))
-
-				buttonOK.Enable()
-				buttonFile.Enable()
-
-				for j := 0; j < len(selectslice); j++ {
-					labels_succ[selectslice[j]].SetText(fmt.Sprintf("%d", cnt[j]))
-					labels_fail[selectslice[j]].SetText(fmt.Sprintf("%d", failcnt[j]))
-				}
-
-				var errStr string
-				var numCount int = 0
-				//通过的组数
-				var numpass int32 = int32(math.Ceil((1 - Alpha - 3*math.Sqrt(float64((Alpha*(1-Alpha))/float64(setcnt)))) * float64(setcnt)))
-				for j := 0; j < len(selectslice); j++ {
-
-					if cnt[j] < numpass {
-						numCount++
-						errStr += itemStr[selectslice[j]]
-						errStr += ",\n"
-					}
-				}
-
-				running = 3
-
-				if 0 == numCount {
-					ui.MsgBox(mainwin, "成功", "所有检测项全部通过")
-				} else {
-					ui.MsgBoxError(mainwin, "失败", fmt.Sprintf("有%d项检测未通过:%s\n", numCount, errStr))
-				}
-
-				processfile = 0
-				percent = 1
-
-			} else {
-
-			}
-		})
-	}
-}
 func main() {
-	running = 3
 	percent = 1
 	ui.Main(setupUI)
 }

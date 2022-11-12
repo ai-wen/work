@@ -32,7 +32,7 @@ if "%n%"=="1" call :1
 if "%n%"=="2" call :2 
 if "%n%"=="3" call :3 
 if /i "%n%"=="n" exit 
-pause 
+
 goto :eof 
 
 :1 

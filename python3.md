@@ -9,20 +9,47 @@
 - https://www.python.org/downloads/release/python-390/
 - https://www.python.org/ftp/python/3.9.0/python-3.9.0-amd64.exe
 
-```bat
 下载安装 放到C:\SoftW\Python目录
+
+创建 py.bat 内容如下：
+并将py.bat 路径设置到PATH环境变量中
 setx PATH "C:\SoftW\Python;%PATH%"
 
-在C:\SoftW\Python创建三个 python37.bat\python38.bat\python39.bat 批处理文件，内容如下
-python37.bat
+```shell
+
+@echo off 
+
+Title Python                                           
+Color 0A    
+echo.       
+echo    1.python 3.70  
+echo    2.python 3.80    
+echo    3.python 3.90  
+echo.
+set /p n=select one: 
+if "%n%"=="" cls&goto :caozuo 
+if "%n%"=="1" call :1 
+if "%n%"=="2" call :2 
+if "%n%"=="3" call :3 
+if /i "%n%"=="n" exit 
+pause 
+goto :eof 
+
+:1 
 set PATH=C:\SoftW\Python\Python37;C:\SoftW\Python\Python37\Scripts;%PATH%
-python38.bat
-set PATH=C:\SoftW\Python\Python37;C:\SoftW\Python\Python37\Scripts;%PATH%
-python39.bat
-set PATH=C:\SoftW\Python\Python37;C:\SoftW\Python\Python37\Scripts;%PATH%
+goto :caozuo 
+:2 
+set PATH=C:\SoftW\Python\Python38;C:\SoftW\Python\Python38\Scripts;%PATH%
+goto :caozuo 
+:3 
+set PATH=C:\SoftW\Python\Python39;C:\SoftW\Python\Python39\Scripts;%PATH%
+goto :caozuo 
+
+:caozuo 
+python -V
 
 ```
-命令行运行  python37
+命令行运行  py
 
 # python3：
 在ubuntu的包中，python的二代和三代版本的命名：二代：python，三代：python3

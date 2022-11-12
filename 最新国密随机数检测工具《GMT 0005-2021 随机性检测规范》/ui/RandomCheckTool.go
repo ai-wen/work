@@ -1242,7 +1242,7 @@ func makeBasicControlsPage() ui.Control {
 		0, 1, 1, 1,
 		true, ui.AlignCenter, false, ui.AlignCenter)
 
-	grid.Append(ui.NewLabel("北京世纪龙脉科技有限公司 V1.5"),
+	grid.Append(ui.NewLabel("北京世纪龙脉科技有限公司 V1.6"),
 		0, 2, 1, 1,
 		true, ui.AlignCenter, true, ui.AlignCenter)
 
@@ -1269,21 +1269,7 @@ func setupUI() {
 	tab.Append("GMT 0005-2021 随机性检测", makeBasicControlsPage())
 	tab.SetMargined(0, true)
 
-	// 获取方法引用
-	User32, err := syscall.LoadLibrary("User32.dll")
-	if err != nil {
-		panic("获取方法引用失败:")
-	}
-	// 释放引用
-	defer syscall.FreeLibrary(User32)
-	SetWindowPos, err := syscall.GetProcAddress(User32, "SetWindowPos")
-	if err == nil {
-		var HWND_TOPMOST int = -1
-		syscall.Syscall9(uintptr(SetWindowPos), 7,
-			0, 0, uintptr(unsafe.Pointer(&HWND_TOPMOST)), 0, 0, 0, 3, 0, 0)
-		//uintptr(unsafe.Pointer(mainwin))
-		fmt.Printf("-----------------------")
-	}
+	
 
 	mainwin.Show()
 

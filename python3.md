@@ -1,3 +1,33 @@
+# 多环境
+https://www.python.org/downloads/release/python-370/
+https://www.python.org/ftp/python/3.7.0/python-3.7.0.exe
+https://www.python.org/ftp/python/3.7.0/python-3.7.0-embed-win32.zip
+https://www.python.org/ftp/python/3.7.0/python-3.7.0-amd64.exe
+https://www.python.org/ftp/python/3.7.0/python-3.7.0-embed-amd64.zip
+
+https://www.python.org/downloads/release/python-380/
+https://www.python.org/ftp/python/3.8.0/python-3.8.0-amd64.exe
+https://www.python.org/ftp/python/3.8.0/python-3.8.0-embed-amd64.zip
+
+https://www.python.org/downloads/release/python-390/
+https://www.python.org/ftp/python/3.9.0/python-3.9.0-amd64.exe
+https://www.python.org/ftp/python/3.9.0/python-3.9.0-embed-amd64.zip
+
+```bat
+下载离线zip 放到C:\SoftW\Python目录
+setx PATH "C:\SoftW\Python;%PATH%"
+
+在C:\SoftW\Python创建三个 python37.bat\python38.bat\python39.bat 批处理文件，内容如下
+python37.bat
+set PATH=C:\SoftW\Python\Python37;C:\SoftW\Python\Python37\Scripts;%PATH%
+python38.bat
+set PATH=C:\SoftW\Python\Python37;C:\SoftW\Python\Python37\Scripts;%PATH%
+python39.bat
+set PATH=C:\SoftW\Python\Python37;C:\SoftW\Python\Python37\Scripts;%PATH%
+
+```
+命令行运行  python37
+
 # python3：
 在ubuntu的包中，python的二代和三代版本的命名：二代：python，三代：python3
 
@@ -25,6 +55,7 @@ from pip._internal import main
 # requirement.txt
 当我们拿到一个项目时，首先要在项目运行环境安装 requirement.txt 所包含的依赖：
 pip install -r requirement.txt
+pip install --no-cache-dir -r requirements.txt
 
 当我们要把环境中的依赖写入 requirement.txt 中时，可以借助 freeze 命令：
 pip freeze >requirements.txt
@@ -38,19 +69,19 @@ pipreqs ./
 
 
 #  当前目录下创建虚拟环境
-python -m venv myvnev
-后面的myvnev代表是在当前路径下创建虚拟环境myvnev，后面跟的是路径
-进入虚拟环境
-Linux下:
-cd myvenv/bin/
-source activate
+- python -m venv myvnev
+- 后面的myvnev代表是在当前路径下创建虚拟环境myvnev，后面跟的是路径
+- 进入虚拟环境
+- Linux下:
+- cd myvenv/bin/
+- source activate
 
-Windows下
-cd myvenv/Scripts
-activate
+- Windows下
+- cd myvenv/Scripts
+- activate
 
 退出虚拟环境
-直接输入命令：deactivate
+- 直接输入命令：deactivate
 
 
 进入之后查看已安装的包
@@ -58,9 +89,9 @@ pip list
 
 
 # 创建备份的python环境
-python -m venv Python38Evn
-cd Python38Evn\Scripts
-copy activate.bat py.bat
+- python -m venv Python38Evn
+- cd Python38Evn\Scripts
+- copy activate.bat py.bat
 
-将 Python38Evn\Scripts 设置到PATH系统变量
-以后 cmd窗口 执行py 就可以进入这个备份的python 环境
+- 将 Python38Evn\Scripts 设置到PATH系统变量
+- 以后 cmd窗口 执行py 就可以进入这个备份的python 环境

@@ -1,20 +1,16 @@
 # 多环境
 - https://www.python.org/downloads/release/python-370/
 - https://www.python.org/ftp/python/3.7.0/python-3.7.0.exe
-- https://www.python.org/ftp/python/3.7.0/python-3.7.0-embed-win32.zip
 - https://www.python.org/ftp/python/3.7.0/python-3.7.0-amd64.exe
-- https://www.python.org/ftp/python/3.7.0/python-3.7.0-embed-amd64.zip
 
 - https://www.python.org/downloads/release/python-380/
 - https://www.python.org/ftp/python/3.8.0/python-3.8.0-amd64.exe
-- https://www.python.org/ftp/python/3.8.0/python-3.8.0-embed-amd64.zip
 
 - https://www.python.org/downloads/release/python-390/
 - https://www.python.org/ftp/python/3.9.0/python-3.9.0-amd64.exe
-- https://www.python.org/ftp/python/3.9.0/python-3.9.0-embed-amd64.zip
 
 ```bat
-下载离线zip 放到C:\SoftW\Python目录
+下载安装 放到C:\SoftW\Python目录
 setx PATH "C:\SoftW\Python;%PATH%"
 
 在C:\SoftW\Python创建三个 python37.bat\python38.bat\python39.bat 批处理文件，内容如下

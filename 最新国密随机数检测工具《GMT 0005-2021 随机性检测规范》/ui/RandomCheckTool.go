@@ -12,9 +12,7 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
-	"syscall"
 	"time"
-	"unsafe"
 
 	"golang.org/x/text/encoding/simplifiedchinese"
 
@@ -1268,8 +1266,6 @@ func setupUI() {
 
 	tab.Append("GMT 0005-2021 随机性检测", makeBasicControlsPage())
 	tab.SetMargined(0, true)
-
-	
 
 	mainwin.Show()
 

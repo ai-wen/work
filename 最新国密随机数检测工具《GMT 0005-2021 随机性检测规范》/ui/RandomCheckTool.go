@@ -573,7 +573,6 @@ func worker(jobs <-chan string, out chan<- *R) {
 			}
 
 			if selectArry[15] == 1 {
-				labeltimeend.SetText(time.Now().Format("2006.01.02 15:04:05"))
 				p, q := randomness.AutocorrelationProto(bits, 2)
 				arr = append(arr, p)
 				arrQ = append(arrQ, q)
@@ -586,7 +585,6 @@ func worker(jobs <-chan string, out chan<- *R) {
 			}
 
 			if selectArry[16] == 1 {
-				labeltimeend.SetText(time.Now().Format("2006.01.02 15:04:05"))
 				p, q := randomness.AutocorrelationProto(bits, 8)
 				arr = append(arr, p)
 				arrQ = append(arrQ, q)

@@ -950,6 +950,9 @@ func makeBasicControlsPage() ui.Control {
 				//checkboxs[25].SetChecked(false)
 				ui.MsgBoxError(mainwin, "随机数检测工具", fmt.Sprintf("Maurer通用统计检测 数据长度至少要满足 L*Q %dbyte", 7*1280))
 				setcnt = 0
+			} else if len(buf) > 1048576 {
+				ui.MsgBoxError(mainwin, "随机数检测工具", "离散傅里叶检测 最大支持128k 文件")
+				setcnt = 0
 			} else {
 
 				if setcnt == 1 {

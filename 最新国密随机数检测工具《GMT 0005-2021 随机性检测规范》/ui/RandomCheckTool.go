@@ -946,15 +946,22 @@ func makeBasicControlsPage() ui.Control {
 			buf, _ := os.ReadFile(filename)
 			labelsetbit.SetText(fmt.Sprintf("%dbit %dbyte", len(buf)*8, len(buf)))
 
-			if len(buf) < (7 * 1280) {
+			if len(buf) < (100 * 1024) {
+				//if len(buf) < (7 * 1280 / 8) {
 				//checkboxs[25].SetChecked(false)
-				ui.MsgBoxError(mainwin, "随机数检测工具", fmt.Sprintf("Maurer通用统计检测 数据长度至少要满足 L*Q %dbyte", 7*1280))
+				//ui.MsgBoxError(mainwin, "随机数检测工具", fmt.Sprintf("Maurer通用统计检测 数据长度至少要满足 L*Q %dbyte", 7*1280/8))
+				ui.MsgBoxError(mainwin, "随机数检测工具", "请提供高质量随机数")
 				setcnt = 0
+				checkboxs[len(itemStr)-1].SetChecked(true)
 			} else if len(buf) > 1048576 {
-				ui.MsgBoxError(mainwin, "随机数检测工具", "离散傅里叶检测 最大支持128k 文件")
-				setcnt = 0
+				ui.MsgBoxError(mainwin, "随机数检测工具", "离散傅里叶检测 最大支持128k 文件,")
+				checkboxs[len(itemStr)-1].SetChecked(false)
+				//setcnt = 0
 			} else {
+				checkboxs[len(itemStr)-1].SetChecked(true)
+			}
 
+			if setcnt > 0 {
 				if setcnt == 1 {
 					entryPath.SetText(filename)
 				} else {

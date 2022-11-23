@@ -6,3 +6,7 @@ ldd RandomCheckTool | cut -d ">" -f 2 |cut -d "(" -f 1
 cp $(ldd RandomCheckTool | cut -d ">" -f 2 |cut -d "(" -f 1 ) lib/
 ll $(ldd RandomCheckTool | cut -d ">" -f 2 |cut -d "(" -f 1 )
 ll $(ldd RandomCheckTool | cut -d ">" -f 2 |cut -d "(" -f 1 ) | awk '{print $11,$10,$9}' | cut -d '>' -f 2
+
+
+docker ps -a | awk '{print $1}'
+docker rm -f $(docker ps -a | awk '{print $1}')

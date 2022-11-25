@@ -241,3 +241,19 @@ int main(int argc , char *argv[])
 - vs：vs默认是不会将符号导出的，所有要导出的符号都必须声明为__declspec(dllexport)，所以只要将不必要导出的符号去掉这个声明就可以了
 - ndk: 可以增加编译选项-fvisibility=hidden，这样默认所有符号就不会导出，对于要导出的符号显示声明__attribute__ ((visibility ("default")))
 - xcode：可以通过ndk方式实现；也可以在xcode的设置中将Symbols Hidden by Default设置为Yes，但是这方式有个坑要注意，当Enable Testability为Yes时，前面的设置无效，所以最直接的方式是ndk那种。
+
+
+
+-fvisibility=hidden 隐藏本地符号
+
+-fvisibility-inlines-hidden 隐藏本地内联符号
+
+-Wl,-Bsymbolic 优先使用本地符号，消除odr
+
+-Wl,--exclude-libs,ALL 隐藏依赖的静态库符号
+
+
+
+### 关于动态库加-fPIC编译选项
+
+是为了生成位置无关的代码，这样多个程序就有可能共享同一个动态库。如果不加这个选项，动态库被加载的时候都要进行地址重定向到自己的进程空间，这样导致每一个使用这个so的进程都会拷贝一份副本。而加了-fPIC这个选项，动态库加载的时候就不需要重定向地址，及位置无关代码，这样多个进程就可以共享同一个so。

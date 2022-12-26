@@ -118,3 +118,92 @@ pip list
 
 - 将 Python38Evn\Scripts 设置到PATH系统变量
 - 以后 cmd窗口 执行py 就可以进入这个备份的python 环境
+
+  
+# playwright 点击浏览器自动录制生成自动化代码
+
+pip install playwright
+
+安装浏览器驱动文件（安装过程稍微有点慢）
+python -m playwright install
+
+## codegen
+python -m playwright codegen --target python -o 'my.py' -b chromium https://www.baidu.com
+
+
+```python
+python -m playwright codegen --help
+Usage: playwright codegen [options] [url]
+
+open page and generate code for user actions
+
+Options:
+  -o, --output <file name>        saves the generated script to a file
+  --target <language>             language to generate, one of javascript, playwright-test, python, python-async,
+                                  python-pytest, csharp, csharp-mstest, csharp-nunit, java (default: "python")
+  --save-trace <filename>         record a trace for the session and save it to a file
+  -b, --browser <browserType>     browser to use, one of cr, chromium, ff, firefox, wk, webkit (default: "chromium")
+  --block-service-workers         block service workers
+  --channel <channel>             Chromium distribution channel, "chrome", "chrome-beta", "msedge-dev", etc
+  --color-scheme <scheme>         emulate preferred color scheme, "light" or "dark"
+  --device <deviceName>           emulate device, for example  "iPhone 11"
+  --geolocation <coordinates>     specify geolocation coordinates, for example "37.819722,-122.478611"
+  --ignore-https-errors           ignore https errors
+  --load-storage <filename>       load context storage state from the file, previously saved with --save-storage
+  --lang <language>               specify language / locale, for example "en-GB"
+  --proxy-server <proxy>          specify proxy server, for example "http://myproxy:3128" or "socks5://myproxy:8080"
+  --proxy-bypass <bypass>         comma-separated domains to bypass proxy, for example ".com,chromium.org,.domain.com"
+  --save-har <filename>           save HAR file with all network activity at the end
+  --save-har-glob <glob pattern>  filter entries in the HAR by matching url against this glob pattern
+  --save-storage <filename>       save context storage state at the end, for later use with --load-storage
+  --timezone <time zone>          time zone to emulate, for example "Europe/Rome"
+  --timeout <timeout>             timeout for Playwright actions in milliseconds, no timeout by default
+  --user-agent <ua string>        specify user agent string
+  --viewport-size <size>          specify browser viewport size in pixels, for example "1280, 720"
+  -h, --help                      display help for command
+
+Examples:
+
+  $ codegen
+  $ codegen --target=python
+  $ codegen -b webkit https://example.com
+
+
+
+from playwright import sync_playwright
+with sync_playwright() as p:
+    for browser_type in [p.chromium, p.firefox, p.webkit]:
+        browser = browser_type.launch()
+        page = browser.newPage()
+        page.goto('https://baidu.com/')
+        page.screenshot(path=f'example-{browser_type.name}.png')
+        browser.close()
+
+import asyncio
+from playwright import async_playwright
+async def main():
+    async with async_playwright() as p:
+        for browser_type in [p.chromium, p.firefox, p.webkit]:
+            browser = await browser_type.launch()
+            page = await browser.newPage()
+            await page.goto('http://baidu.com/')
+            await page.screenshot(path=f'example-{browser_type.name}.png')
+            await browser.close()
+asyncio.get_event_loop().run_until_complete(main())
+
+from playwright import sync_playwright
+with sync_playwright() as p:
+    iphone_11 = p.devices['iPhone 11 Pro']
+    browser = p.webkit.launch(headless=False)
+    context = browser.newContext(
+        **iphone_11,
+        locale='en-US',
+        geolocation={ 'longitude': 12.492507, 'latitude': 41.889938 },
+        permissions=['geolocation']
+    )
+    page = context.newPage()
+    page.goto('https://maps.google.com')
+    page.click('text="Your location"')
+    page.screenshot(path='colosseum-iphone.png')
+    browser.close()
+``

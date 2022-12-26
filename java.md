@@ -1,3 +1,22 @@
+# 自定义JCE
+问题：java.lang.SecurityException: JCE cannot authenticate the provider LmCrypto
+Exception in thread "main" java.security.NoSuchProviderException: JCE cannot authenticate the provider Foo
+java.lang.SecurityException: JCE cannot authenticate the provider BC
+
+如果provider提供的服务受到某些政府的限制，则仅需对其进行签名。例如，Cipher实现是受限制的"服务"，而MessageDigest是不受限制的服务。
+
+解决方案一：[修补 jce.jar 中的 JarVerifier.class 文件。](https://stackoverflow.com/questions/44450857/)
+
+解决方案二：使用openjdk 没有签名限制
+
+解决方案三：官方网站提供了JCE无限制权限策略文件的下载：
+[JDK6的下载地址：](http://www.oracle.com/technetwork/java/javase/downloads/jce-6-download-429243.html)
+[JDK7的下载地址：](http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html)
+[DK8的下载地址：](http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html)
+方案三中的缺陷：策略文件貌似只放开了 bouncycastle 的限制。
+解决方案四，依赖bouncycastle来实现,自定义的provider也不行
+
+
 # jar
 jar 与 zip 唯一的区别就是在 jar 文件的内容中，包含了一个 META-INF/MANIFEST.MF 文件，该文件是在生成 jar 文件的时候自动创建的，作为jar里面的"详情单"，包含了该Jar包的版本、创建人和类搜索路径Class-Path等信息，当然如果是可执行Jar包，会包含Main-Class属性，表明Main方法入口，尤其是较为重要的Class-Path和Main-Class
 

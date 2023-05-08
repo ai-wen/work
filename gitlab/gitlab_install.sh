@@ -71,6 +71,15 @@ rsync -av /var/opt/gitlab/git-data/ /gitdata/   #同步文件内容
 gitlab-ctl upgrade
 gitlab-ctl start
 
+# 4、设置发件邮箱
+gitlab_rails['smtp_enable']=true
+gitlab_rails['smtp_address']='smtp.ym.163.com'
+['smtp_port']=25
+['smtp_user_name'] = ""
+['smtp_password']=""
+['smtp domain']='smtp.ym.163.com'
+['smtp_tls'] = false
+
 # 4、备份
 手动备份
 gitlab_rails['backup_path'] = '/gitdata/gitlab_backups'
@@ -92,6 +101,7 @@ systemctl restart crond     #修改后重启cron服务
 
 0 18 * * * /opt/gitlab/bin/gitlab-rake gitlab:backup:create
 15 18 * * * /gitlab/bak.sh
+创建脚本备份到另一个目录/ /mnt/hgfs/ 本机等
 sudo cp /gitdata/repositories /gitlab/ -rfp
 sudo cp /gitdata/gitlab_backups/* /gitlab/ -fp
 sudo rm /gitdata/gitlab_backups/* -f

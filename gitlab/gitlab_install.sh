@@ -92,7 +92,8 @@ systemctl restart crond     #修改后重启cron服务
 
 0 18 * * * /opt/gitlab/bin/gitlab-rake gitlab:backup:create
 15 18 * * * /gitlab/bak.sh
-sudo cp /gitdata/* /gitlab/ -rfp
+sudo cp /gitdata/repositories /gitlab/ -rfp
+sudo cp /gitdata/gitlab_backups/* /gitlab/ -fp
 
 
 
